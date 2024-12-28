@@ -4,10 +4,11 @@ package business;
  * @author Chris
  *
  */
-import java.util.Date;
-import java.util.List;
 
 import lombok.*;
+
+import java.util.Date;
+import java.util.List;
 @Getter
 // Add setter methds
 @Setter

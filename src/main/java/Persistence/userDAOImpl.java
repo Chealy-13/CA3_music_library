@@ -4,12 +4,10 @@ package Persistence;
  * D00229247
  */
 import business.user;
-import java.sql.Connection;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Implementation of the UserDAO interface

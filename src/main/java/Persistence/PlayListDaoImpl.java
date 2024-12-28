@@ -1,6 +1,5 @@
 package Persistence;
 
-import business.Artist;
 import business.PlayList;
 import business.Song;
 

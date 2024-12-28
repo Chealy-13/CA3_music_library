@@ -5,8 +5,6 @@ package Persistence;
  */
 import business.user;
 
-import java.util.List;
-
 public interface userDAO {
 
     user LoginU(String username);

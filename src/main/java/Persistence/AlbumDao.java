@@ -7,7 +7,6 @@ package Persistence;
 import business.Album;
 import business.Song;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public interface AlbumDao {
