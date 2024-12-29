@@ -1,7 +1,7 @@
 package Persistence;
 /**
  *
- * @author Chris
+ * @author Sophie
  *
  */
 import business.Song;
@@ -15,8 +15,6 @@ public interface SongDao {
 
     List<Song> getAllSongs();
 
-//    Song getSongByArtistId(int artistId);
-
     List<Song> getSongsByArtistId(int artistId);
 
     List<Song> getSongsByAlbumId(int albumId);
@@ -24,5 +22,13 @@ public interface SongDao {
     boolean deleteBySongId(int songId);
 
     boolean addSong(Song song);
+
+    List<Song> getSongsRatedByUser(int userId);
+
+    boolean rateSong(int songId, int userId, int rating);
+
+    Song getTopRatedSong();
+
+    Song getMostPopularSong();
 
 }

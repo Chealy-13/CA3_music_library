@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 /**
  *
- * @author Chris
+ * @author Sophie
  *
  */
 public class SongDaoImpl extends MySQLDao implements SongDao {
@@ -324,7 +324,7 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
             ps.setString(1, song.getSongTitle());
             ps.setInt(2, song.getAlbumID());
             ps.setInt(3, song.getArtistID());
-            ps.setString(4, song.getInfo());
+            ps.setString(4, song.getAdditionalInfo());
 
             rowsAffected = ps.executeUpdate();
 
@@ -347,6 +347,128 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
         return rowsAffected > 0;
     }
 
+
+    /**
+     * Retrieves a list of songs that have been rated by a specific user.
+     * This method joins the `songs` table with the `ratings` table based on the `songId`
+     * and retrieves all songs that the specified user has rated. The user is identified
+     * by their userId. The resulting songs are returned in a list.
+     *
+     * @param userId the unique identifier of the user whose rated songs are to be retrieved.
+     * @return a list of Song objects that have been rated by the specified user, or an empty list if no songs are found.
+     */
+    @Override
+    public List<Song> getSongsRatedByUser(int userId) {
+        List<Song> ratedSongs = new ArrayList<>();
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT s.* FROM songs s JOIN ratings r ON s.songId = r.songId WHERE r.userId = ?")) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ratedSongs.add(mapRow(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving rated songs: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            super.freeConnection(conn);
+        }
+        return ratedSongs;
+    }
+
+    /**
+     * Rates a song by a specific user. If the user has already rated the song, the rating is updated.
+     * If the user has not rated the song before, a new rating entry is created in the `ratings` table.
+     * The rating is an integer value representing the user's opinion of the song.
+     *
+     * @param songId the unique identifier of the song to be rated.
+     * @param userId the unique identifier of the user who is rating the song.
+     * @param rating the rating value given by the user, typically an integer within a predefined range (e.g., 1 to 5).
+     * @return true if the rating was successfully inserted or updated, false otherwise.
+     */
+    @Override
+    public boolean rateSong(int songId, int userId, int rating) {
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO ratings (songId, userId, rating) VALUES (?, ?, ?) " +
+                        "ON DUPLICATE KEY UPDATE rating = ?")) {
+            ps.setInt(1, songId);
+            ps.setInt(2, userId);
+            ps.setInt(3, rating);
+            ps.setInt(4, rating);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Error rating song: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            super.freeConnection(conn);
+        }
+        return false;
+    }
+
+
+    /**
+     * Retrieves the top-rated song from the database. This method calculates the average rating
+     * for each song by joining the `songs` and `ratings` tables and orders the results by the average rating
+     * in descending order, returning the song with the highest average rating.
+     *
+     * @return the Song object representing the top-rated song, or null if no songs have been rated.
+     */
+    @Override
+    public Song getTopRatedSong() {
+        Song topRatedSong = null;
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT s.*, AVG(r.rating) as avgRating FROM songs s " +
+                        "JOIN ratings r ON s.songId = r.songId " +
+                        "GROUP BY s.songId ORDER BY avgRating DESC LIMIT 1")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    topRatedSong = mapRow(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving top-rated song: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            super.freeConnection(conn);
+        }
+        return topRatedSong;
+    }
+
+    /**
+     * Retrieves the most popular song based on the number of ratings it has received.
+     * This method counts the number of ratings for each song by joining the `songs` and `ratings` tables,
+     * ordering the results by the count of ratings in descending order, and returning the song with the highest count.
+     *
+     * @return the Song object representing the most popular song (based on the number of ratings), or null if no songs have ratings.
+     */
+    @Override
+    public Song getMostPopularSong() {
+        Song mostPopularSong = null;
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT s.*, COUNT(r.songId) as ratingCount FROM songs s " +
+                        "JOIN ratings r ON s.songId = r.songId " +
+                        "GROUP BY s.songId ORDER BY ratingCount DESC LIMIT 1")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    mostPopularSong = mapRow(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving most popular song: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            super.freeConnection(conn);
+        }
+        return mostPopularSong;
+    }
+
+
     /**
      * Maps the current row of the given ResultSet to a Song object.
      * This method extracts the values of each relevant column from the current row of the
@@ -363,9 +485,12 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
                 .songTitle(rs.getString("songTitle"))
                 .albumID(rs.getInt("albumId"))
                 .artistID(rs.getInt("artistId"))
-                .info(rs.getString("additionalInfo"))
+                .additionalInfo(rs.getString("additionalInfo"))
                 .build();
         // Return the extracted Customer (or null if the resultset was empty)
         return s;
     }
+
+
+
 }

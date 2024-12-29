@@ -2,12 +2,12 @@ package business;
 import lombok.*;
 /**
  *
- * @author Chris
+ * @author Sophie
  *
  */
 // Add getter methods
 @Getter
-// Add setter methds
+// Add setter methods
 @Setter
 // Add a toString method
 @ToString
@@ -40,7 +40,9 @@ public class Song implements Comparable<Song>{
     @NonNull
     private int artistID;
     @NonNull
-    private String info;
+    private String additionalInfo;
+//    @NonNull
+//    private double averageRating;
 
 
 
@@ -65,11 +67,11 @@ public class Song implements Comparable<Song>{
      * Each piece of information is displayed on a new line for better readability.
      * @return a string representation of the song.
      */
-    public String format() {
+    public String toString() {
         return "Song ID: " + songID +
                 "\nSong Title: " + songTitle +
                 "\nAlbum ID: " + albumID +
                 "\nArtist ID: " + artistID +
-                "\nInfo: " + info;
+                "\nInfo: " + additionalInfo;
     }
 }
