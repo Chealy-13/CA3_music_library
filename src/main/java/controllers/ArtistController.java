@@ -29,8 +29,10 @@ public class ArtistController {
     @GetMapping("/viewArtist/{id}")
     public String viewArtist(@PathVariable("id") int artistId, Model model) {
         Artist artist = artistDao.getArtistByArtistId(artistId);
+        List<Song> songsByArtist = artistDao.getSongsByArtist(artistId);
         model.addAttribute("artist", artist);
-        return "artistById";
+        model.addAttribute("songs", songsByArtist);
+        return "artistDetails";
     }
 
 }
