@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Artists</title>
+</head>
+<body>
+<h1>Artists</h1>
+<ul>
+    <th:block th:each="artist : ${artists}">
+        <li>
+            <a th:href="@{/viewArtist/{id}(id=${artist.artistId})}" th:text="${artist.name}">Artist Name</a>
+        </li>
+    </th:block>
+</ul>
+</body>
+</html>
