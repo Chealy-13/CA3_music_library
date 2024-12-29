@@ -2,11 +2,11 @@ package business;
 import lombok.*;
 /**
  *
- * @author Chris
+ * @author Sophie
  *
  */
 @Getter
-// Add setter methds
+// Add setter methods
 @Setter
 // Add a toString method
 @ToString

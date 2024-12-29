@@ -1,10 +1,11 @@
 package Persistence;
 /**
  *
- * @author Chris
+ * @author Sophie
  *
  */
 import business.Artist;
+import business.Song;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -117,6 +118,155 @@ public class ArtistDaoImpl extends MySQLDao implements ArtistDao {
         }
         return artists;
     }
+
+    /**
+     * Retrieves an Artist object from the database based on the artist's name.
+     * It establishes a connection to the database, executes a query to find the artist
+     * with the specified name, and maps the result to an Artist object.
+     * If no artist is found with the provided name, this method returns null.
+     *
+     * @param artistName the name of the artist to retrieve.
+     * @return an Artist object corresponding to the specified artist name,
+     *         or null if no artist is found with that name.
+     * @throws SQLException if a database access error occurs or if there is an issue
+     *         executing the query or processing the result set.
+     */
+    @Override
+    public Artist getArtistByName(String artistName) {
+        Artist artist = null;
+
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM artists WHERE name = ?")) {
+            ps.setString(1, artistName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    artist = mapRow(rs);
+                }
+            } catch (SQLException e) {
+                System.out.println("SQL Exception occurred when executing SQL or processing results.");
+                System.out.println("Error: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Exception occurred when attempting to prepare SQL for execution");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            super.freeConnection(conn);
+        }
+        return artist;
+    }
+
+    /**
+     * Retrieves a list of Song objects from the database associated with a specific artist.
+     * It establishes a connection to the database, executes a query to find all songs
+     * by the given artist ID, and maps the results to a list of Song objects.
+     * If no songs are found for the given artist ID, an empty list is returned.
+     *
+     * @param artistId the ID of the artist whose songs to retrieve.
+     * @return a list of Song objects associated with the specified artist ID,
+     *         or an empty list if no songs are found for that artist.
+     * @throws SQLException if a database access error occurs or if there is an issue
+     *         executing the query or processing the result set.
+     */
+    @Override
+    public List<Song> getSongsByArtist(int artistId) {
+        List<Song> songs = new ArrayList<>();
+
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM songs WHERE artistId = ?")) {
+            ps.setInt(1, artistId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Song song = new Song(
+                            rs.getInt("songId"),
+                            rs.getString("title"),
+                            rs.getInt("artistId"),
+                            rs.getInt("album"),
+                            rs.getString("genre")
+                    );
+                    songs.add(song);
+                }
+            } catch (SQLException e) {
+                System.out.println("SQL Exception occurred when executing SQL or processing results.");
+                System.out.println("Error: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Exception occurred when attempting to prepare SQL for execution");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            super.freeConnection(conn);
+        }
+        return songs;
+    }
+
+
+
+    /**
+     * Updates the name of an existing artist in the database based on the artist's ID.
+     * It establishes a connection to the database, executes an update query, and checks
+     * whether the update was successful by verifying if any rows were affected.
+     *
+     * @param artist the Artist object containing the updated information (e.g., artist name).
+     * @return true if the artist was successfully updated, otherwise false.
+     * @throws SQLException if a database access error occurs or if there is an issue
+     *         executing the update query.
+     */
+    @Override
+    public boolean updateArtist(Artist artist) {
+        boolean updated = false;
+
+        Connection conn = super.getConnection();
+        String query = "UPDATE artists SET name = ? WHERE artistId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, artist.getArtistName());
+            ps.setInt(2, artist.getArtistID());
+            int rowsAffected = ps.executeUpdate();
+            updated = rowsAffected > 0; // Check if any rows were updated
+        } catch (SQLException e) {
+            System.out.println("SQL Exception occurred when updating artist");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            super.freeConnection(conn);
+        }
+        return updated;
+    }
+
+    /**
+     * Deletes an artist from the database based on the artist's ID.
+     * It establishes a connection to the database, executes a delete query, and checks
+     * whether the deletion was successful by verifying if any rows were affected.
+     *
+     * @param artistId the ID of the artist to be deleted.
+     * @return true if the artist was successfully deleted, otherwise false.
+     * @throws SQLException if a database access error occurs or if there is an issue
+     *         executing the delete query.
+     */
+    @Override
+    public boolean deleteArtist(int artistId) {
+        boolean deleted = false;
+
+        Connection conn = super.getConnection();
+        String query = "DELETE FROM artists WHERE artistId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, artistId);
+            int rowsAffected = ps.executeUpdate();
+            deleted = rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("SQL Exception occurred when deleting artist");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            super.freeConnection(conn);
+        }
+        return deleted;
+    }
+
+
+
 
     /**
      * Maps a single row of the result set to an Artist object.
