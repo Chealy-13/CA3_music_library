@@ -7,9 +7,9 @@ import business.user;
 
 public interface userDAO {
 
-    user LoginU(String username);
+    user loginUser(String username);
 
-    boolean RegisterU(String username, String password, String email);
+    boolean registerUser(String username, String password, String email);
 
     boolean deleteByUsername(String username);
 
