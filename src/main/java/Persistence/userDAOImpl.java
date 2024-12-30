@@ -56,26 +56,18 @@ public class userDAOImpl extends MySQLDao implements userDAO {
      */
 
     @Override
-    public boolean RegisterU(String username, String password, String email) {
-        //This ine is used instert row to "users" table with values: useranme, password, email.
+    public boolean registerUser(String username, String password, String email) {
         String sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-        try (PreparedStatement state = getConnection().prepareStatement(sql)) {
-            // Set the first '?' placeholder in the SQL query to the user's username
-            state.setString(1, username);
-            // Set the second '?' placeholder in the SQL query to the user's password
-            state.setString(2, password);
-            // Set the third '?' placeholder in the SQL query to the user's email
-            state.setString(3, email);
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setString(1, username);
+            statement.setString(2, password);
+            statement.setString(3, email);
 
-            return state.executeUpdate() > 0;
-
+            return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.out.println("SQL Exception occurred when attempting to prepare SQL for execution.");
-            System.out.println("Error: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error during user registration: " + e.getMessage());
+            return false;
         }
-        // Return false if fails or an exception occurs
-        return false;
     }
     /**
      *
@@ -89,7 +81,7 @@ public class userDAOImpl extends MySQLDao implements userDAO {
      * @throws SQLException if there is an error executing the SQL statement or retrieving the results.
      */
     @Override
-    public user LoginU(String username) {
+    public user loginUser(String username) {
         //This SQL query selects all fields from the 'users' table where the username matches
         String sql = "SELECT * FROM users WHERE username = ?";
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
