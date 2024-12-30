@@ -100,6 +100,25 @@ public class userDAOImpl extends MySQLDao implements userDAO {
         }
         return null;
     }
+    /**
+     * Checks if a username is available.
+     * @param username the username to check.
+     * @return true if the username is available, false otherwise.
+     */
+    public boolean isUsernameAvailable(String username) {
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setString(1, username);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) == 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Checking username availability: " + e.getMessage());
+        }
+        return false;
+    }
 
     /**
      * Checks if an email is available.
