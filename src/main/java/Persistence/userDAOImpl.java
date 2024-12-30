@@ -102,6 +102,27 @@ public class userDAOImpl extends MySQLDao implements userDAO {
     }
 
     /**
+     * Checks if an email is available.
+     * @param email the email to check.
+     * @return true if the email is available, false otherwise.
+     */
+    public boolean isEmailAvailable(String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setString(1, email);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) == 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Checking email availability: " + e.getMessage());
+        }
+        return false;
+    }
+
+
+    /**
      * Deletes user based on username from database
      * This method executes an SQL DELETE statement to remove a user from the
      * 'users' table.
