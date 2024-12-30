@@ -17,21 +17,23 @@ public class userDAOImpl extends MySQLDao implements userDAO {
     /**
      * Validates information by checking the format of the details.
      */
-    private static final String cardNum = "^(\\d{16})$";
-    private static final String expireDate = "^(0[1-9]|1[0-2])/\\d{2}$"; // MM/YY
-    private static final String cvv = "^\\d{3,4}$";
-
+    private static final String CARD_NUM_PATTERN = "^(\\d{16})$";
+    private static final String EXPIRY_DATE_PATTERN = "^(0[1-9]|1[0-2])/\\d{2}$"; // MM/YY
+    private static final String CVV_PATTERN = "^\\d{3,4}$";
 
     /**
-     * @param cardNumber the credit card number has to be exactly 16 digits.
-     * @param expireD    the expiry date in a MM/YY format, from (01-12) and YY is the last two numbers of a year.
-     * @param cvv1       a 3 or 4 digit security code.
-     * @return {true} if all three pieces of information match the expected format. {false} otherwise
+     * Validates credit card information based on predefined patterns.
+     *
+     * @param cardNumber the credit card number (16 digits).
+     * @param expiryDate the expiry date in MM/YY format.
+     * @param cvv        the CVV code (3 or 4 digits).
+     * @return true if all inputs match the patterns; false otherwise.
      */
-    public boolean validateCCInfo(String cardNumber, String expireD, String cvv1) {
-        return cardNumber.matches(cardNum) &&
-                expireD.matches(expireDate) &&
-                cvv1.matches(cvv);
+    @Override
+    public boolean validateCCInfo(String cardNumber, String expiryDate, String cvv) {
+        return cardNumber.matches(CARD_NUM_PATTERN) &&
+                expiryDate.matches(EXPIRY_DATE_PATTERN) &&
+                cvv.matches(CVV_PATTERN);
     }
 
     /**
