@@ -82,33 +82,21 @@ public class userDAOImpl extends MySQLDao implements userDAO {
      */
     @Override
     public user loginUser(String username) {
-        //This SQL query selects all fields from the 'users' table where the username matches
         String sql = "SELECT * FROM users WHERE username = ?";
-        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
-            // Sets the first parameter in the SQL query to the provided 'username'
-            ps.setString(1, username);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    // Creates and returns a new 'user' object with data from the result set
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setString(1, username);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
                     return new user(
-                            rs.getInt("userId"),
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("email")
-
+                            resultSet.getInt("userId"),
+                            resultSet.getString("username"),
+                            resultSet.getString("password"),
+                            resultSet.getString("email")
                     );
                 }
-                // Catches and prints SQL exceptions related to the inner try block (ResultSet operations)
-            } catch (SQLException e) {
-                System.out.println("SQL Exception occurred when attempting to prepare SQL for execution.");
-                System.out.println("Error: " + e.getMessage());
-                e.printStackTrace();
-
             }
-            // Catches and prints SQL exceptions related to the outer try block (PreparedStatement operations)
         } catch (SQLException e) {
-            System.out.println("ClassNotFoundException occurred when trying to load driver: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error during user login: " + e.getMessage());
         }
         return null;
     }
