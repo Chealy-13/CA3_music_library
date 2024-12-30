@@ -8,6 +8,8 @@ import business.user;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of the UserDAO interface
@@ -48,9 +50,10 @@ public class userDAOImpl extends MySQLDao implements userDAO {
     /**
      * Registers a new user by inserting their username, password, and email into the "users" table.
      * Excecutes an SL INSERT to add a new record to the "users"table
+     *
      * @param username the username of the new user, must be unique in the database.
      * @param password the password of the new user to be registered.
-     * @param email the email of the new user to be registered.
+     * @param email    the email of the new user to be registered.
      * @return {true} if the user was successfully registered,{false} if the insertion failed or an exception occurred.
      * @throws SQLException if a database access error occurs, or the SQL statement is invalid.
      */
@@ -69,13 +72,14 @@ public class userDAOImpl extends MySQLDao implements userDAO {
             return false;
         }
     }
+
     /**
-     *
      * Collects a user from the database by username.
      * The method gets the SQL query to select all fields from the 'users' table,
      * where it matches the username. If a match is found,
      * a User object is created and returned with the user's information. If no
      * users are found, or if an exception occurs the method will return null.
+     *
      * @param username the username of the user to be retrieved from the database.
      * @return a User object if found, or if no matching user is found.
      * @throws SQLException if there is an error executing the SQL statement or retrieving the results.
@@ -100,8 +104,10 @@ public class userDAOImpl extends MySQLDao implements userDAO {
         }
         return null;
     }
+
     /**
      * Checks if a username is available.
+     *
      * @param username the username to check.
      * @return true if the username is available, false otherwise.
      */
@@ -122,6 +128,7 @@ public class userDAOImpl extends MySQLDao implements userDAO {
 
     /**
      * Checks if an email is available.
+     *
      * @param email the email to check.
      * @return true if the email is available, false otherwise.
      */
@@ -146,6 +153,7 @@ public class userDAOImpl extends MySQLDao implements userDAO {
      * This method executes an SQL DELETE statement to remove a user from the
      * 'users' table.
      * If the deletion is successful, it returns true; otherwise, it returns false.
+     *
      * @param username of user will be deleted
      * @return true if the user was successfully deleted, false otherwise or if an error occurred
      */
@@ -167,56 +175,55 @@ public class userDAOImpl extends MySQLDao implements userDAO {
             E.printStackTrace();
         }
         return false;
-
     }
 
-/**
- * Extracts a user object from the ResultSet.
- * @param resultSet the ResultSet containing user data.
- * @return a User object populated with the data from the ResultSet.
- */
-private user extractUserFromResultSet(ResultSet resultSet) throws SQLException {
-    return new user(
-            resultSet.getInt("userId"),
-            resultSet.getString("username"),
-            resultSet.getString("password"),
-            resultSet.getString("email"));
-}
-}
+    /**
+     * Extracts a user object from the ResultSet.
+     *
+     * @param resultSet the ResultSet containing user data.
+     * @return a User object populated with the data from the ResultSet.
+     */
+    private user extractUserFromResultSet(ResultSet resultSet) throws SQLException {
+        return new user(
+                resultSet.getInt("userId"),
+                resultSet.getString("username"),
+                resultSet.getString("password"),
+                resultSet.getString("email"));
+    }
 
+}
     /**
      * Collects all users from the 'users' table in the database.
      * The resulting list of users,
      * If no users are found, an empty list is returned.
      *
      * @return a List of {user} objects representing all users in the database.
-     *         Returns nothing if list is empty.
+     * Returns nothing if list is empty.
      */
-   // public List<user> getAllUsers() {
-     //   // Creates a new Arraylist ro store objects
-       // List<user> users = new ArrayList<>();
-        //String sql = "SELECT * FROM users";
-        //try (PreparedStatement statement = connection.prepareStatement(sql)) {
-          //  try (ResultSet rs = statement.executeQuery()) {
-            //    while (rs.next()) {
-              //      user user = new user(
-                //            rs.getInt("userId"),
-                  //          rs.getString("username"),
-                    //        rs.getString("password"),
-                      //      rs.getString("email")
-                    //);
+ //   public List<user> getAllUsers() {
+        // Creates a new Arraylist ro store objects
+   //     List<user> users = new ArrayList<>();
+     //   String sql = "SELECT * FROM users";
+       // try (PreparedStatement statement = connection.prepareStatement(sql)) {
+         //   try (ResultSet rs = statement.executeQuery()) {
+           //     while (rs.next()) {
+             //       user user = new user(
+               //             rs.getInt("userId"),
+                 //           rs.getString("username"), rs.getString("password"),
+                   //         rs.getString("email")
+                   // );
                     //users.add(user);
-              //  }
+                //}
             //} catch (SQLException e) {
-                //System.out.println("SQL Exception occurred when executing SQL or processing results.");
+              //  System.out.println("SQL Exception occurred when executing SQL or processing results.");
                 //System.out.println("Error: " + e.getMessage());
                 //e.printStackTrace();
-          //  }
+            //}
         //} catch (SQLException e) {
-          //  System.out.println("SQL Exception occurred when attempting to prepare SQL for execution");
-            //System.out.println("Error: " + e.getMessage());
-            //e.printStackTrace();
-        //}
-            //return users;
-     //   }
+         //   System.out.println("SQL Exception occurred when attempting to prepare SQL for execution");
+       //     System.out.println("Error: " + e.getMessage());
+     //       e.printStackTrace();
+   //     }
+     //   return users;
     //}
+//}

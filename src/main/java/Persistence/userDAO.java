@@ -4,6 +4,9 @@ package Persistence;
  * D00229247
  */
 import business.user;
+import org.apache.catalina.User;
+
+import java.util.List;
 
 public interface userDAO {
 
@@ -14,7 +17,11 @@ public interface userDAO {
     boolean deleteByUsername(String username);
 
     boolean validateCCInfo(String cardNumber, String expiryDate, String cvv);
-    //List<user> getAllUsers();
 
+    boolean isUsernameAvailable(String username);
+
+    boolean isEmailAvailable(String email);
+
+    //List<User> getAllUsers();
 
 }
