@@ -169,7 +169,21 @@ public class userDAOImpl extends MySQLDao implements userDAO {
         return false;
 
     }
+
+/**
+ * Extracts a user object from the ResultSet.
+ * @param resultSet the ResultSet containing user data.
+ * @return a User object populated with the data from the ResultSet.
+ */
+private user extractUserFromResultSet(ResultSet resultSet) throws SQLException {
+    return new user(
+            resultSet.getInt("userId"),
+            resultSet.getString("username"),
+            resultSet.getString("password"),
+            resultSet.getString("email"));
 }
+}
+
     /**
      * Collects all users from the 'users' table in the database.
      * The resulting list of users,
