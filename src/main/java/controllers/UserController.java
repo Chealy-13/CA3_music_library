@@ -1,5 +1,8 @@
 package controllers;
 
+import Persistence.UserDao;
+import Persistence.UserDaoImpl;
+import business.User;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -24,8 +27,7 @@ public class UserController {
 
         } else if (password == null || password.isBlank()) {
             errorMessage = "You must create a password to register";
-        }
-        else if(confirm == null || confirm.isBlank() || !confirm.equals(password)){
+        } else if (confirm == null || confirm.isBlank() || !confirm.equals(password)) {
             errorMessage = "Passwords must match!";
 
         } else if (email == null || email.isBlank()) {
@@ -35,4 +37,13 @@ public class UserController {
             model.addAttribute("errorMessage", errorMessage);
             return "registration";
         }
+        User newUser = User.builder()
+                .username(username)
+                .password(password)
+                .firstName(first)
+                .lastName(last)
+                .email(email)
+                .isAdmin(false)
+                .build();
+
     }
