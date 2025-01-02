@@ -100,6 +100,41 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
                 && u.getPassword() != null && !u.getPassword().isBlank()
                 && u.getEmail() != null && !u.getEmail().isBlank();
     }
+
+    @Override
+    public User loginUser(String username, String password) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Username required to log in");
+        }
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Password required to log in");
+        }
+
+        Connection conn = super.getConnection();
+        User result = null;
+        String sql = "SELECT * FROM users where username = ? AND password COLLATE utf8mb4_bin = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, password);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    result = User.builder()
+                            .username(rs.getString("username"))
+                            .email(rs.getString("email"))
+                            .firstName(rs.getString("firstName"))
+                            .lastName(rs.getString("lastName"))
+                            .isAdmin(rs.getBoolean("isAdmin"))
+                            .build();
+                }
+            }
+        } catch (SQLException e) {
+            log.error("An error with the username: " + username, e);
+        }
+
+        super.freeConnection(conn);
+        return result;
+    }
 }
     /**
      * Collects a user from the database by username.
