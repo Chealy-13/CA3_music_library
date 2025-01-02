@@ -14,7 +14,7 @@ import java.util.List;
  * Implementation of the PlayListDAO interface
  * to manage PlayList.java records in database.
  */
-public  class PlayListDaoImpl extends MySQLDao implements PlayListDao{
+public  class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
 
     private final Connection connection;
 
@@ -22,7 +22,7 @@ public  class PlayListDaoImpl extends MySQLDao implements PlayListDao{
      * Constructs a PlayListDAOImpl with the specified database connection.
      * @param conn is the Connection object to connect to the database.
      */
-    public PlayListDaoImpl(Connection conn) {
+    public PlaylistDaoImpl(Connection conn) {
         super();
         this.connection = conn;
     }
