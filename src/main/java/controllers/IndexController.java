@@ -21,4 +21,8 @@ public class IndexController {
     @GetMapping("/album_index")
     public String albumIndex(){ return "album_index"; }
 
+    @GetMapping("/registerPage")
+    public String registration(){
+        return "registration";
+    }
 }

@@ -31,12 +31,12 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
      * @param cvv        the CVV code (3 or 4 digits).
      * @return true if all inputs match the patterns; false otherwise.
      */
-    @Override
-    public boolean validateCCInfo(String cardNumber, String expiryDate, String cvv) {
-        return cardNumber.matches(CARD_NUM_PATTERN) &&
-                expiryDate.matches(EXPIRY_DATE_PATTERN) &&
-                cvv.matches(CVV_PATTERN);
-    }
+    //@Override
+    //public boolean validateCCInfo(String cardNumber, String expiryDate, String cvv) {
+      //  return cardNumber.matches(CARD_NUM_PATTERN) &&
+        //        expiryDate.matches(EXPIRY_DATE_PATTERN) &&
+          //      cvv.matches(CVV_PATTERN);
+    //}
 
     /**
      * Constructs a UserDAOImpl with the specified database connection.
@@ -84,26 +84,26 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
      * @return a User object if found, or if no matching user is found.
      * @throws SQLException if there is an error executing the SQL statement or retrieving the results.
      */
-    @Override
-    public User loginUser(String username) {
-        String sql = "SELECT * FROM users WHERE username = ?";
-        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
-            statement.setString(1, username);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return new User(
-                            resultSet.getInt("userId"),
-                            resultSet.getString("username"),
-                            resultSet.getString("password"),
-                            resultSet.getString("email")
-                    );
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error during user login: " + e.getMessage());
-        }
-        return null;
-    }
+    //@Override
+    //public User loginUser(String username) {
+        //String sql = "SELECT * FROM users WHERE username = ?";
+        //try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            //statement.setString(1, username);
+            //try (ResultSet resultSet = statement.executeQuery()) {
+                //if (resultSet.next()) {
+                    //return new User(
+                      //      resultSet.getInt("userId"),
+                    //        resultSet.getString("username"),
+                  //          resultSet.getString("password"),
+                //            resultSet.getString("email")
+              //      );
+            //    }
+          //  }
+        //} catch (SQLException e) {
+          //  System.err.println("Error during user login: " + e.getMessage());
+        //}
+      //  return null;
+    //}
 
     /**
      * Checks if a username is available.
@@ -111,20 +111,20 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
      * @param username the username to check.
      * @return true if the username is available, false otherwise.
      */
-    public boolean isUsernameAvailable(String username) {
-        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
-        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
-            statement.setString(1, username);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getInt(1) == 0;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Checking username availability: " + e.getMessage());
-        }
-        return false;
-    }
+   // public boolean isUsernameAvailable(String username) {
+        //String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+        //try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            //statement.setString(1, username);
+            //try (ResultSet resultSet = statement.executeQuery()) {
+              //  if (resultSet.next()) {
+            //        return resultSet.getInt(1) == 0;
+          //      }
+          //  }
+        //} catch (SQLException e) {
+          //  System.err.println("Checking username availability: " + e.getMessage());
+        //}
+      //  return false;
+    //}
 
     /**
      * Checks if an email is available.
@@ -132,20 +132,20 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
      * @param email the email to check.
      * @return true if the email is available, false otherwise.
      */
-    public boolean isEmailAvailable(String email) {
-        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
-        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
-            statement.setString(1, email);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getInt(1) == 0;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Checking email availability: " + e.getMessage());
-        }
-        return false;
-    }
+    //public boolean isEmailAvailable(String email) {
+        //String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        //try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            //statement.setString(1, email);
+            //try (ResultSet resultSet = statement.executeQuery()) {
+            //    if (resultSet.next()) {
+          //          return resultSet.getInt(1) == 0;
+        //        }
+      //      }
+    //    } catch (SQLException e) {
+      //      System.err.println("Checking email availability: " + e.getMessage());
+       // }
+        //return false;
+    //}
 
 
     /**
@@ -158,24 +158,24 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
      * @return true if the user was successfully deleted, false otherwise or if an error occurred
      */
 
-    @Override
-    public boolean deleteByUsername(String username) {
+    //@Override
+    //public boolean deleteByUsername(String username) {
         //Sql delete query is used to remove a user with specified username
-        String sql = "DELETE FROM users WHERE username = ?";
+      //  String sql = "DELETE FROM users WHERE username = ?";
         //This line is used to stop sql injection and handle parameters safely
-        try (PreparedStatement state = getConnection().prepareStatement(sql)) {
-            //Username provided as a method parameter will replace the '?'
-            state.setString(1, username);
+  //      try (PreparedStatement state = getConnection().prepareStatement(sql)) {
+          //Username provided as a method parameter will replace the '?'
+     //       state.setString(1, username);
             //This line runs the delete operation, it returns the number of rows affected
-            int rowChoice = state.executeUpdate();
-            return rowChoice > 0;
-        } catch (SQLException E) {
-            System.out.println("SQL Exception occurred when attempting to prepare SQL for execution.");
-            System.out.println("Error: " + E.getMessage());
-            E.printStackTrace();
-        }
-        return false;
-    }
+       //     int rowChoice = state.executeUpdate();
+         //   return rowChoice > 0;
+        //} catch (SQLException E) {
+          //  System.out.println("SQL Exception occurred when attempting to prepare SQL for execution.");
+            //System.out.println("Error: " + E.getMessage());
+            //E.printStackTrace();
+        //}
+        //return false;
+    //}
 
     /**
      * Extracts a user object from the ResultSet.
@@ -183,15 +183,15 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
      * @param resultSet the ResultSet containing user data.
      * @return a User object populated with the data from the ResultSet.
      */
-    private User extractUserFromResultSet(ResultSet resultSet) throws SQLException {
-        return new User(
-                resultSet.getInt("userId"),
-                resultSet.getString("username"),
-                resultSet.getString("password"),
-                resultSet.getString("email"));
+  //  private User extractUserFromResultSet(ResultSet resultSet) throws SQLException {
+    //    return new User(
+      //          resultSet.getInt("userId"),
+        //        resultSet.getString("username"),
+          //      resultSet.getString("password"),
+            //    resultSet.getString("email"));
     }
 
-}
+//}
 /**
  * Collects all users from the 'users' table in the database.
  * The resulting list of users,
