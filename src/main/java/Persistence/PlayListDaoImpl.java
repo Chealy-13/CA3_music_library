@@ -1,6 +1,6 @@
 package Persistence;
 
-import business.PlayList;
+import business.Playlist;
 import business.Song;
 
 import java.sql.Connection;
@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Implementation of the PlayListDAO interface
- * to manage PlayList records in database.
+ * to manage PlayList.java records in database.
  */
 public  class PlayListDaoImpl extends MySQLDao implements PlayListDao{
 
@@ -34,13 +34,13 @@ public  class PlayListDaoImpl extends MySQLDao implements PlayListDao{
      * @return: Return an obj/playlist.
      */
     @Override
-    public PlayList getPlayListById(int id) {
+    public Playlist getPlayListById(int id) {
         String sql = "SELECT * FROM playlist WHERE playlistId = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new PlayList(
+                    return new Playlist(
                             rs.getInt("playlistId"),
                             rs.getInt("userId"),
                             rs.getString("name"),
