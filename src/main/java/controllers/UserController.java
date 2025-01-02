@@ -16,7 +16,7 @@ public class UserController {
     @PostMapping("register")
     public String register(@RequestParam(name = "username") String username,
                            @RequestParam(name = "password") String password,
-                           @RequestParam(name="confirm") String confirm,
+                           @RequestParam(name = "confirm") String confirm,
                            @RequestParam(name = "first", required = false) String first,
                            @RequestParam(name = "last", required = false) String last,
                            @RequestParam(name = "email") String email,
@@ -45,5 +45,19 @@ public class UserController {
                 .email(email)
                 .isAdmin(false)
                 .build();
-
+        UserDao userDao = new UserDaoImpl("database.properties");
+        boolean registered = userDao.registerUser(newUser);
+        if (registered) {
+            String success = "Registration successful, you are now logged in.";
+            model.addAttribute("message", success);
+            User loggedInUser = userDao.loginUser(username, password);
+            session.setAttribute("currentUser", loggedInUser);
+            return "index";
+        } else {
+            log.info("Could not register user with username: " + username + " and email: " + email + ".");
+            String failed = "Username/email address unavailable.";
+            model.addAttribute("errorMessage", failed);
+            return "registration";
+        }
     }
+}

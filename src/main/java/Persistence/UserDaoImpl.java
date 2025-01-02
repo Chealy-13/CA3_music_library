@@ -16,12 +16,23 @@ import java.util.List;
  */
 @Slf4j
 public class UserDaoImpl extends MySQLDao implements UserDao {
+    public UserDaoImpl() {
+        super();
+    }
+
+    public UserDaoImpl(Connection conn) {
+        super(conn);
+    }
+
+    public UserDaoImpl(String propertiesFilename) {
+        super(propertiesFilename);
+    }
     /**
      * Validates information by checking the format of the details.
      */
-    private static final String CARD_NUM_PATTERN = "^(\\d{16})$";
-    private static final String EXPIRY_DATE_PATTERN = "^(0[1-9]|1[0-2])/\\d{2}$"; // MM/YY
-    private static final String CVV_PATTERN = "^\\d{3,4}$";
+    //private static final String CARD_NUM_PATTERN = "^(\\d{16})$";
+    //private static final String EXPIRY_DATE_PATTERN = "^(0[1-9]|1[0-2])/\\d{2}$"; // MM/YY
+    //private static final String CVV_PATTERN = "^\\d{3,4}$";
 
     /**
      * Validates credit card information based on predefined patterns.
@@ -33,20 +44,20 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
      */
     //@Override
     //public boolean validateCCInfo(String cardNumber, String expiryDate, String cvv) {
-      //  return cardNumber.matches(CARD_NUM_PATTERN) &&
-        //        expiryDate.matches(EXPIRY_DATE_PATTERN) &&
-          //      cvv.matches(CVV_PATTERN);
+    //  return cardNumber.matches(CARD_NUM_PATTERN) &&
+    //        expiryDate.matches(EXPIRY_DATE_PATTERN) &&
+    //      cvv.matches(CVV_PATTERN);
     //}
 
     /**
      * Registers a new user by inserting their username, password, and email into the "users" table.
      * Excecutes an SL INSERT to add a new record to the "users"table
      *
-     * @para username the username of the new user, must be unique in the database.
      * @param /password the password of the new user to be registered.
      * @param /email    the email of the new user to be registered.
      * @return {true} if the user was successfully registered,{false} if the insertion failed or an exception occurred.
      * @throws SQLException if a database access error occurs, or the SQL statement is invalid.
+     * @para username the username of the new user, must be unique in the database.
      */
 
     @Override
@@ -89,8 +100,6 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
                 && u.getPassword() != null && !u.getPassword().isBlank()
                 && u.getEmail() != null && !u.getEmail().isBlank();
     }
-
-
 }
     /**
      * Collects a user from the database by username.
