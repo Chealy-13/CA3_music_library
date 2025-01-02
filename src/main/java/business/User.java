@@ -1,25 +1,25 @@
 package business;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 /**
  * @author Damian Magiera
  * D00229247
  */
 
-@Data
+import lombok.*;
+
+@Getter
+@ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+public class User {
 
-
-public class user
-{
-    private int userid;
     private String username;
     private String password;
+    private String firstName;
+    private String lastName;
+    private boolean isAdmin;
     private String email;
-
-
-     }
+}
 
 
