@@ -3,14 +3,12 @@ package Persistence;
  * @author Damian Magiera
  * D00229247
  */
-import business.user;
-import org.apache.catalina.User;
+import business.User;
 
-import java.util.List;
 
-public interface userDAO {
+public interface UserDao {
 
-    user loginUser(String username);
+    User loginUser(String username);
 
     boolean registerUser(String username, String password, String email);
 

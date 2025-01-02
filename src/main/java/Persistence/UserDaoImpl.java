@@ -3,7 +3,7 @@ package Persistence;
  * @author Damian Magiera
  * D00229247
  */
-import business.user;
+import business.User;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +15,7 @@ import java.util.List;
  * Implementation of the UserDAO interface
  * to manage user records in database.
  */
-public class userDAOImpl extends MySQLDao implements userDAO {
+public class UserDaoImpl extends MySQLDao implements UserDao {
     /**
      * Validates information by checking the format of the details.
      */
@@ -85,13 +85,13 @@ public class userDAOImpl extends MySQLDao implements userDAO {
      * @throws SQLException if there is an error executing the SQL statement or retrieving the results.
      */
     @Override
-    public user loginUser(String username) {
+    public User loginUser(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";
         try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
             statement.setString(1, username);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return new user(
+                    return new User(
                             resultSet.getInt("userId"),
                             resultSet.getString("username"),
                             resultSet.getString("password"),
@@ -183,8 +183,8 @@ public class userDAOImpl extends MySQLDao implements userDAO {
      * @param resultSet the ResultSet containing user data.
      * @return a User object populated with the data from the ResultSet.
      */
-    private user extractUserFromResultSet(ResultSet resultSet) throws SQLException {
-        return new user(
+    private User extractUserFromResultSet(ResultSet resultSet) throws SQLException {
+        return new User(
                 resultSet.getInt("userId"),
                 resultSet.getString("username"),
                 resultSet.getString("password"),
@@ -192,38 +192,38 @@ public class userDAOImpl extends MySQLDao implements userDAO {
     }
 
 }
-    /**
-     * Collects all users from the 'users' table in the database.
-     * The resulting list of users,
-     * If no users are found, an empty list is returned.
-     *
-     * @return a List of {user} objects representing all users in the database.
-     * Returns nothing if list is empty.
-     */
- //   public List<user> getAllUsers() {
-        // Creates a new Arraylist ro store objects
-   //     List<user> users = new ArrayList<>();
-     //   String sql = "SELECT * FROM users";
-       // try (PreparedStatement statement = connection.prepareStatement(sql)) {
-         //   try (ResultSet rs = statement.executeQuery()) {
-           //     while (rs.next()) {
-             //       user user = new user(
-               //             rs.getInt("userId"),
-                 //           rs.getString("username"), rs.getString("password"),
-                   //         rs.getString("email")
-                   // );
-                    //users.add(user);
-                //}
-            //} catch (SQLException e) {
-              //  System.out.println("SQL Exception occurred when executing SQL or processing results.");
-                //System.out.println("Error: " + e.getMessage());
-                //e.printStackTrace();
-            //}
-        //} catch (SQLException e) {
-         //   System.out.println("SQL Exception occurred when attempting to prepare SQL for execution");
-       //     System.out.println("Error: " + e.getMessage());
-     //       e.printStackTrace();
-   //     }
-     //   return users;
-    //}
+/**
+ * Collects all users from the 'users' table in the database.
+ * The resulting list of users,
+ * If no users are found, an empty list is returned.
+ *
+ * @return a List of {user} objects representing all users in the database.
+ * Returns nothing if list is empty.
+ */
+//   public List<user> getAllUsers() {
+// Creates a new Arraylist ro store objects
+//     List<user> users = new ArrayList<>();
+//   String sql = "SELECT * FROM users";
+// try (PreparedStatement statement = connection.prepareStatement(sql)) {
+//   try (ResultSet rs = statement.executeQuery()) {
+//     while (rs.next()) {
+//       user user = new user(
+//             rs.getInt("userId"),
+//           rs.getString("username"), rs.getString("password"),
+//         rs.getString("email")
+// );
+//users.add(user);
+//}
+//} catch (SQLException e) {
+//  System.out.println("SQL Exception occurred when executing SQL or processing results.");
+//System.out.println("Error: " + e.getMessage());
+//e.printStackTrace();
+//}
+//} catch (SQLException e) {
+//   System.out.println("SQL Exception occurred when attempting to prepare SQL for execution");
+//     System.out.println("Error: " + e.getMessage());
+//       e.printStackTrace();
+//     }
+//   return users;
+//}
 //}
