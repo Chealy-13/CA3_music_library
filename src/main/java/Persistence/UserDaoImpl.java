@@ -4,10 +4,9 @@ package Persistence;
  * D00229247
  */
 import business.User;
+import lombok.extern.slf4j.Slf4j;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +14,7 @@ import java.util.List;
  * Implementation of the UserDAO interface
  * to manage user records in database.
  */
+@Slf4j
 public class UserDaoImpl extends MySQLDao implements UserDao {
     /**
      * Validates information by checking the format of the details.
@@ -39,40 +39,59 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
     //}
 
     /**
-     * Constructs a UserDAOImpl with the specified database connection.
-     *
-     * @param con is the Connection object to connect to the database.
-     */
-//    public userDAOImpl(Connection con) {
-//        this.connection = con;
-//    }
-
-    /**
      * Registers a new user by inserting their username, password, and email into the "users" table.
      * Excecutes an SL INSERT to add a new record to the "users"table
      *
-     * @param username the username of the new user, must be unique in the database.
-     * @param password the password of the new user to be registered.
-     * @param email    the email of the new user to be registered.
+     * @para username the username of the new user, must be unique in the database.
+     * @param /password the password of the new user to be registered.
+     * @param /email    the email of the new user to be registered.
      * @return {true} if the user was successfully registered,{false} if the insertion failed or an exception occurred.
      * @throws SQLException if a database access error occurs, or the SQL statement is invalid.
      */
 
     @Override
-    public boolean registerUser(String username, String password, String email) {
-        String sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
-            statement.setString(1, username);
-            statement.setString(2, password);
-            statement.setString(3, email);
-
-            return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Error during user registration: " + e.getMessage());
-            return false;
+    public boolean registerUser(User user) {
+        if (!validateUser(user)) {
+            throw new IllegalArgumentException("Username, password, and email must be supplied for registration.");
         }
+
+        String sql = "INSERT INTO users (username, password, firstName, lastName, email, isAdmin) VALUES(?, ?, ?, ?, ?, ?)";
+        try (Connection conn = getConnection()) {
+            if (conn == null) {
+                log.error("Unable to establish connection to the database.");
+                return false;
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, user.getUsername());
+                ps.setString(2, user.getPassword());
+                ps.setString(3, user.getFirstName());
+                ps.setString(4, user.getLastName());
+                ps.setString(5, user.getEmail());
+                ps.setBoolean(6, user.isAdmin());
+
+                int rowsAffected = ps.executeUpdate();
+                return rowsAffected > 0;
+            }
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            log.error("Constraint violation appeared registering user: {}", user.getUsername(), e);
+        } catch (SQLException e) {
+            log.error("SQL exception appeared registering user: {}", user.getUsername(), e);
+        }
+        return false;
     }
 
+
+    private boolean validateUser(User u) {
+        return u != null
+                && u.getUsername() != null && !u.getUsername().isBlank()
+                && u.getPassword() != null && !u.getPassword().isBlank()
+                && u.getEmail() != null && !u.getEmail().isBlank();
+    }
+
+
+}
     /**
      * Collects a user from the database by username.
      * The method gets the SQL query to select all fields from the 'users' table,
@@ -189,7 +208,7 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
         //        resultSet.getString("username"),
           //      resultSet.getString("password"),
             //    resultSet.getString("email"));
-    }
+//    }
 
 //}
 /**
