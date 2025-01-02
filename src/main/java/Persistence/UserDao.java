@@ -9,6 +9,7 @@ import business.User;
 public interface UserDao {
 
     //User loginUser(String username);
+    User loginUser(String username, String password);
 
     boolean registerUser(User user);
 
