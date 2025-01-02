@@ -5,6 +5,29 @@
     <title>Title</title>
 </head>
 <body>
+<div id="registerForm">
+  <h2>Register an Account</h2>
+  <form method="post" action="/register">
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username" required><br>
 
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" required><br>
+
+    <label for="confirm">Please confirm your password:</label><br>
+    <input type="password" id="confirm" name="confirm" required><br>
+
+    <label for="first">First name:</label><br>
+    <input type="text" id="first" name="first">required<br>
+
+    <label for="last">Surname:</label><br>
+    <input type="text" id="last" name="last">required<br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" required><br>
+
+    <input type="submit" value="Submit">
+  </form>
+</div>
 </body>
 </html>

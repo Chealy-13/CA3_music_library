@@ -13,6 +13,7 @@ public class UserController {
     @PostMapping("register")
     public String register(@RequestParam(name = "username") String username,
                            @RequestParam(name = "password") String password,
+                           @RequestParam(name="confirm") String confirm,
                            @RequestParam(name = "first", required = false) String first,
                            @RequestParam(name = "last", required = false) String last,
                            @RequestParam(name = "email") String email,
@@ -20,8 +21,13 @@ public class UserController {
         String errorMessage = null;
         if (username == null || username.isBlank()) {
             errorMessage = "You must create a username to register";
+
         } else if (password == null || password.isBlank()) {
             errorMessage = "You must create a password to register";
+        }
+        else if(confirm == null || confirm.isBlank() || !confirm.equals(password)){
+            errorMessage = "Passwords must match!";
+
         } else if (email == null || email.isBlank()) {
             errorMessage = " You can not register without a valid email";
         }
