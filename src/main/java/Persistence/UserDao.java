@@ -13,6 +13,7 @@ public interface UserDao {
     User loginUser(String username, String password);
 
     boolean registerUser(User user);
+    boolean updateUser(User user); // New method
 
     //boolean deleteByUsername(String username);
 

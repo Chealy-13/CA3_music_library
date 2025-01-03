@@ -10,6 +10,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.ca3_music_library.sql.DatabaseConnect.getConnection;
+
 /**
  * Implementation of the UserDAO interface
  * to manage user records in database.
@@ -134,6 +136,24 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
 
         super.freeConnection(conn);
         return result;
+    }
+
+    @Override
+    public boolean updateUser(User user) {
+        String sql = "UPDATE users SET firstName = ?, lastName = ?, email = ? WHERE username = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, user.getFirstName());
+            ps.setString(2, user.getLastName());
+            ps.setString(3, user.getEmail());
+            ps.setString(4, user.getUsername());
+
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            log.error("Error updating user: {}", user.getUsername(), e);
+        }
+        return false;
     }
 }
     /**
