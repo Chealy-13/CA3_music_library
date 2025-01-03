@@ -78,7 +78,7 @@ public class UserController {
         }
 
         UserDao userDao = new UserDaoImpl("database.properties");
-        User loggedInUser = userDao.login(username, password);
+        User loggedInUser = userDao.loginUser(username, password);
         if (loggedInUser != null) {
             String success = "Login successful";
             model.addAttribute("message", success);
@@ -100,6 +100,16 @@ public class UserController {
         }
         model.addAttribute("user", loggedInUser);
         return "profile";
+    }
+    @GetMapping("/editProfile")
+    public String showEditProfilePage(Model model, HttpSession session) {
+        User loggedInUser = (User) session.getAttribute("currentUser");
+        if (loggedInUser == null) {
+            model.addAttribute("errorMessage", "You must login to edit details");
+            return "login";
+        }
+        model.addAttribute("user", loggedInUser);
+        return "editProfile";
     }
 
 }
