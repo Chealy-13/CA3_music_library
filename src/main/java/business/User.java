@@ -5,7 +5,10 @@ package business;
  */
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
+
+@Slf4j
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -14,7 +17,9 @@ import lombok.*;
 @Builder
 public class User {
 
+    @EqualsAndHashCode.Include
     private String username;
+    @ToString.Exclude
     private String password;
     private String firstName;
     private String lastName;

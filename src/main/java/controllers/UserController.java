@@ -60,4 +60,22 @@ public class UserController {
             return "registration";
         }
     }
+    @PostMapping("login")
+    public String login(@RequestParam(name = "username") String username,
+                        @RequestParam(name = "password") String password,
+                        Model model, HttpSession session) {
+        String errorMsg = null;
+        if (username == null || username.isBlank()) {
+            errorMsg = "Cannot register without a username";
+        } else if (password == null || password.isBlank()) {
+            errorMsg = "Cannot register without a password";
+        }
+        if (errorMsg != null) {
+            model.addAttribute("errorMessage", errorMsg);
+            return "login";
+        }
+
+    }
+
+
 }
