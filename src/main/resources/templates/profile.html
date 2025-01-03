@@ -1,10 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>User Profile</title>
+
 </head>
 <body>
+<div class="menu-bar">
+    <div th:replace="~{fragments/menu :: menu-bar}"></div>
+</div>
 
+<div class="profile-container">
+    <div class="profile-header">Your Profile</div>
+    <div class="profile-field">
+        <span class="profile-label">Username:</span> <span th:text="${user.username}"></span>
+    </div>
+    <div class="profile-field">
+        <span class="profile-label">First Name:</span> <span th:text="${user.firstName}"></span>
+    </div>
+    <div class="profile-field">
+        <span class="profile-label">Last Name:</span> <span th:text="${user.lastName}"></span>
+    </div>
+    <div class="profile-field">
+        <span class="profile-label">Email:</span> <span th:text="${user.email}"></span>
+    </div>
+    <div class="profile-field">
+        <span class="profile-label">Admin:</span> <span th:text="${user.isAdmin ? 'Yes' : 'No'}"></span>
+    </div>
+</div>
 </body>
 </html>
