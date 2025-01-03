@@ -5,6 +5,15 @@
     <title>Title</title>
 </head>
 <body>
+<nav class="menu-bar">
+    <ul>
 
+        <li><a th:href="@{/}" th:text="#{menu.home}"></a></li>
+        <li th:if="${#ctx.session.currentUser == null}"><a th:href="@{/loginPage}" th:text="#{menu.login}"></a></li>
+        <li th:if="${#ctx.session.currentUser == null}"><a th:href="@{/registerPage}" th:text="#{menu.register}"></a></li>
+        <li th:unless="${#ctx.session.currentUser == null}"><a th:href="@{/logout}" th:text="#{menu.logout}"></a></li>
+    </ul>
+
+</nav>
 </body>
 </html>
