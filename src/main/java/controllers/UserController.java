@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -60,6 +61,7 @@ public class UserController {
             return "registration";
         }
     }
+
     @PostMapping("login")
     public String login(@RequestParam(name = "username") String username,
                         @RequestParam(name = "password") String password,
@@ -75,7 +77,29 @@ public class UserController {
             return "login";
         }
 
+        UserDao userDao = new UserDaoImpl("database.properties");
+        User loggedInUser = userDao.login(username, password);
+        if (loggedInUser != null) {
+            String success = "Login successful";
+            model.addAttribute("message", success);
+            session.setAttribute("currentUser", loggedInUser);
+            return "index";
+        } else {
+            String failed = "Username/password incorrect.";
+            model.addAttribute("errorMessage", failed);
+            return "login";
+        }
     }
 
+    @GetMapping("/profile")
+    public String viewProfile(Model model, HttpSession session) {
+        User loggedInUser = (User) session.getAttribute("currentUser");
+        if (loggedInUser == null) {
+            model.addAttribute("errorMessage", "You need to log in to view your profile.");
+            return "login";
+        }
+        model.addAttribute("user", loggedInUser);
+        return "profile";
+    }
 
 }
