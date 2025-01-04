@@ -7,6 +7,7 @@ import business.User;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
+import java.time.LocalDate;
 
 @Slf4j
 public class UserDaoImpl extends MySQLDao implements UserDao {
@@ -22,6 +23,14 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
         super(propertiesFilename);
     }
 
+    /**
+     * Logs in a user by validating the provided username and password against the database.
+     *
+     * @param username the username of the user trying to log in
+     * @param password the password of the user trying to log in
+     * @return a {@link User} object if the login is successful, or {@code null} if the credentials are invalid
+     * @throws IllegalArgumentException if either the username or password is null or blank
+     */
     @Override
     public User login(String username, String password) {
         if (username == null || username.isBlank()) {
@@ -102,14 +111,33 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
     }
 
     @Override
+    public boolean updateSubscription(String username, boolean subscriptionStatus, LocalDate subscriptionExpiry) {
+        String sql = "UPDATE users SET subscriptionStatus = ?, subscriptionExpiry = ? WHERE username = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, subscriptionStatus);
+            ps.setDate(2, Date.valueOf(subscriptionExpiry));
+            ps.setString(3, username);
+
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            log.error("Error updating subscription for user: {}", username, e);
+        }
+        return false;
+    }
+
+    @Override
     public boolean updateUser(User user) {
-        String sql = "UPDATE users SET firstName = ?, lastName = ?, email = ? WHERE username = ?";
+        String sql = "UPDATE users SET firstName = ?, lastName = ?, email = ?, subscriptionStatus = ?, subscriptionExpiry = ? WHERE username = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setString(3, user.getEmail());
-            ps.setString(4, user.getUsername());
+            ps.setBoolean(4, user.isSubscriptionStatus());
+            ps.setDate(5, user.getSubscriptionExpiry() != null ? Date.valueOf(user.getSubscriptionExpiry()) : null);
+            ps.setString(6, user.getUsername());
 
             int rowsUpdated = ps.executeUpdate();
             return rowsUpdated > 0;
