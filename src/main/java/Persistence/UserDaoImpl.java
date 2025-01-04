@@ -24,11 +24,11 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
     }
 
     /**
-     * Logs in a user by validating the provided username and password against the database.
+     * Logss in the user by validating/checking the provided username and password with the database.
      *
      * @param username the username of the user trying to log in
      * @param password the password of the user trying to log in
-     * @return a {@link User} object if the login is successful, or {@code null} if the credentials are invalid
+     * @return object if the login is successful, or null if the credentials are invalid
      * @throws IllegalArgumentException if either the username or password is null or blank
      */
     @Override
@@ -65,7 +65,19 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
         super.freeConnection(conn);
         return result;
     }
-
+    /**
+     * Registers a new user to the database
+     * First it validates the provided user object to make sure mandatory fields are not null or blank.
+     * Then it prepares and executes the SQL `INSERT` statement to save the user's details in the database.
+     * lastly logs the success or failure of the operation.
+     *
+     * @param user The object containing the user's details to be registered.
+     * Mandatory fields are as folloes username, password, and email.
+     * and then optional ones are firstName and lastName.
+     * @return true if the user has successfully registered, false otherwise.
+     * @throws IllegalArgumentException if the provided user object fails validation.
+     * @throws IllegalStateException if a database constraint is violated (duplicate username or email).
+     */
     @Override
     public boolean register(User user) {
         if (!validateUser(user)) {
@@ -109,7 +121,17 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
                 && u.getPassword() != null && !u.getPassword().isBlank()
                 && u.getEmail() != null && !u.getEmail().isBlank();
     }
+/**
+ * Updates the subscription status and expiry date for a user in the database.
+ * Firstly connects to the database and prepares an SQL `UPDATE` statement.
+ * Then updates the `subscriptionStatus` and `subscriptionExpiry` fields for the specified username.
+ * Lastly executes the SQL statement and returns whether the operation was successful.
 
+ * @param username The username of the user whose subscription details need to be updated.
+ * @param subscriptionStatus The new subscription status.
+ * @param subscriptionExpiry The new subscription expiry date as a (localdate).
+ * @return returns if the subscription details are successfully updated false otherwise.
+ */
     @Override
     public boolean updateSubscription(String username, boolean subscriptionStatus, LocalDate subscriptionExpiry) {
         String sql = "UPDATE users SET subscriptionStatus = ?, subscriptionExpiry = ? WHERE username = ?";
@@ -126,8 +148,19 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
         }
         return false;
     }
-
-    @Override
+/**
+ * The ppoint of this method is to update the user's details in the database, including their personal information and subscription details.
+ * It does the following
+ * First establishes a connection to the database.
+ * Then executes an SQL
+ * Lastly returns whether the update operation was successful.
+ *
+ * @param user The {@link User} object containing updated information for the user. This includes:
+ *  First name, Last name, Email, Subscription status, Subscription expiry date (nullable, can be {@code null} if no expiry date is set)
+ *  Username (used to identify the user in the database)
+ * @return true if the user details were successfully updated in the database and false otherwise.
+ */
+ @Override
     public boolean updateUser(User user) {
         String sql = "UPDATE users SET firstName = ?, lastName = ?, email = ?, subscriptionStatus = ?, subscriptionExpiry = ? WHERE username = ?";
         try (Connection conn = getConnection();
