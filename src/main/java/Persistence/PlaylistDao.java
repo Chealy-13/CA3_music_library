@@ -10,9 +10,18 @@ import business.Song;
 import java.util.List;
 
 public interface PlaylistDao {
-    public Playlist getPlayListById(int id);
-    public boolean deletePlayListById(int id);
-    public  boolean addSongToPlayList(Song s);
-    public  boolean deleteSongFromPlatList(int songId);
-    public List<Song> getAllSongsOnPlayList();
+    boolean createPlaylist(Playlist playlist);
+
+    boolean updatePlaylist(Playlist playlist);
+
+    boolean deletePlaylist(int playlistId);
+
+    Playlist getPlaylistById(int playlistId);
+
+    List<Playlist> getAllPlaylists(int userId);
+
+    List<Playlist> getPublicPlaylists();
+
+    List<Playlist> getUserPlaylists(int userId);
+
 }
