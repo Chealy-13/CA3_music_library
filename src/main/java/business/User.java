@@ -3,18 +3,19 @@ package business;
  * @author Damian Magiera
  * D00229247
  */
-
 import lombok.*;
-@Setter
+
+import java.time.LocalDate;
+
 @Getter
+@Setter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class User {
     @EqualsAndHashCode.Include
-    private int userId;
     private String username;
     @ToString.Exclude
     private String password;
@@ -22,4 +23,6 @@ public class User {
     private String lastName;
     private boolean isAdmin;
     private String email;
+    private boolean subscriptionStatus; // To track if the subscription is active
+    private LocalDate subscriptionExpiry; // To track when the subscription expires
 }
