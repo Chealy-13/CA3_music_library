@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang=en xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Language Menu</title>
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+
+<div th:fragment="language-menu-bar" class="dropdown-container">
+    <form th:action="@{/changeLanguage}" method="get">
+        <select name="lang" id="lang" onchange="this.form.submit()" class="dropdown">
+            <option th:selected="${#locale.language == 'en'}" th:value="en" th:text="English"></option>
+            <option th:selected="${#locale.language == 'fr'}" th:value="fr" th:text="Français"></option>
+            <option th:selected="${#locale.language == 'es'}" th:value="es" th:text="Espanol"></option>
+        </select>
+    </form>
+</div>
+</body>
+</html>
