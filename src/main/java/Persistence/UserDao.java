@@ -9,10 +9,8 @@ import business.User;
 
 public interface UserDao {
 
-    //User loginUser(String username);
-    User loginUser(String username, String password);
-
-    boolean registerUser(User user);
+    User login(String username, String password);
+    boolean register(User user);
     boolean updateUser(User user); // New method
 
     //boolean deleteByUsername(String username);

@@ -7,9 +7,11 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Slf4j
 @Controller
@@ -17,25 +19,23 @@ public class UserController {
     @PostMapping("register")
     public String register(@RequestParam(name = "username") String username,
                            @RequestParam(name = "password") String password,
-                           @RequestParam(name = "confirm") String confirm,
+                           @RequestParam(name = "confirmPass") String confirm,
                            @RequestParam(name = "first", required = false) String first,
                            @RequestParam(name = "last", required = false) String last,
                            @RequestParam(name = "email") String email,
                            Model model, HttpSession session) {
-        String errorMessage = null;
+        String errorMsg = null;
         if (username == null || username.isBlank()) {
-            errorMessage = "You must create a username to register";
-
+            errorMsg = "Cannot register without a username";
         } else if (password == null || password.isBlank()) {
-            errorMessage = "You must create a password to register";
+            errorMsg = "Cannot register without a password";
         } else if (confirm == null || confirm.isBlank() || !confirm.equals(password)) {
-            errorMessage = "Passwords must match!";
-
+            errorMsg = "Passwords must match!";
         } else if (email == null || email.isBlank()) {
-            errorMessage = " You can not register without a valid email";
+            errorMsg = "Cannot register without a valid email";
         }
-        if (errorMessage != null) {
-            model.addAttribute("errorMessage", errorMessage);
+        if (errorMsg != null) {
+            model.addAttribute("errorMessage", errorMsg);
             return "registration";
         }
         User newUser = User.builder()
@@ -46,12 +46,13 @@ public class UserController {
                 .email(email)
                 .isAdmin(false)
                 .build();
+
         UserDao userDao = new UserDaoImpl("database.properties");
-        boolean registered = userDao.registerUser(newUser);
+        boolean registered = userDao.register(newUser);
         if (registered) {
             String success = "Registration successful, you are now logged in.";
             model.addAttribute("message", success);
-            User loggedInUser = userDao.loginUser(username, password);
+            User loggedInUser = userDao.login(username, password);
             session.setAttribute("currentUser", loggedInUser);
             return "index";
         } else {
@@ -78,7 +79,7 @@ public class UserController {
         }
 
         UserDao userDao = new UserDaoImpl("database.properties");
-        User loggedInUser = userDao.loginUser(username, password);
+        User loggedInUser = userDao.login(username, password);
         if (loggedInUser != null) {
             String success = "Login successful";
             model.addAttribute("message", success);
@@ -101,15 +102,60 @@ public class UserController {
         model.addAttribute("user", loggedInUser);
         return "profile";
     }
+
+    @GetMapping("/logout")
+    public String logout(Model model, HttpSession session) {
+        session.setAttribute("currentUser", null);
+
+        model.addAttribute("message", "Logout successful.");
+        return "index";
+    }
+
     @GetMapping("/editProfile")
     public String showEditProfilePage(Model model, HttpSession session) {
         User loggedInUser = (User) session.getAttribute("currentUser");
         if (loggedInUser == null) {
-            model.addAttribute("errorMessage", "You must login to edit details");
-            return "login";
+            model.addAttribute("errorMessage", "You need to log in to edit your profile.");
+            return "login"; // Redirect to login if the user is not logged in
         }
-        model.addAttribute("user", loggedInUser);
+        model.addAttribute("user", loggedInUser); // Pass the user details to the view
         return "editProfile";
     }
 
+    @PostMapping("/edit")
+    public String updateUserDetails(@RequestParam(name = "username") String username,
+                                    @RequestParam(name = "first", required = false) String first,
+                                    @RequestParam(name = "last", required = false) String last,
+                                    @RequestParam(name = "email") String email,
+                                    HttpSession session, Model model) {
+        log.info("POST /edit triggered with username: {}, first: {}, last: {}, email: {}", username, first, last, email);
+
+
+        User loggedInUser = (User) session.getAttribute("currentUser");
+        if (loggedInUser == null) {
+            log.error("No user found in session. Redirecting to login page.");
+            model.addAttribute("errorMessage", "You need to log in to edit your profile.");
+            return "login";
+        }
+
+
+        loggedInUser.setUsername(username);
+        loggedInUser.setFirstName(first);
+        loggedInUser.setLastName(last);
+        loggedInUser.setEmail(email);
+
+        UserDao userDao = new UserDaoImpl("database.properties");
+        boolean updated = userDao.updateUser(loggedInUser);
+
+        if (updated) {
+            log.info("Profile updated successfully for user: {}", username);
+            session.setAttribute("currentUser", loggedInUser); // Update session
+            model.addAttribute("message", "Your profile has been updated successfully.");
+            return "redirect:/";
+        } else {
+            log.error("Failed to update profile for user: {}", username);
+            model.addAttribute("errorMessage", "Failed to update your profile. Please try again.");
+            return "editProfile";
+        }
+    }
 }

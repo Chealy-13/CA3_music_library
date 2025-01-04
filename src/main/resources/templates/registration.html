@@ -1,32 +1,126 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <title>Registration</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    {
+      background-color: #1a1a1a;
+      padding: 15px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-bar ul {
+      list-style-type: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+
+    .menu-bar ul li {
+      margin: 0 15px;
+    }
+
+    .menu-bar ul li a {
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 10px 15px;
+      transition: all 0.3s ease;
+      border-radius: 5px;
+    }
+
+    .menu-bar ul li a:hover {
+      background-color: #007bff;
+      color: white;
+    }
+
+
+    #registerForm {
+      width: 30%;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #registerForm h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    #registerForm label {
+      font-size: 16px;
+      color: #333;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    #registerForm input {
+      width: 100%;
+      padding: 12px;
+      margin: 5px 0 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    #registerForm input[type="submit"] {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 12px;
+    }
+
+    #registerForm input[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+
+    /* Responsive Form */
+    @media (max-width: 768px) {
+      #registerForm {
+        width: 80%;
+      }
+    }
+  </style>
 </head>
 <body>
+
+<div th:replace="~{Additional/menu :: menu-bar}"></div>
+<p th:if="${errorMessage != null}" th:text="${errorMessage}"></p>
+
 <div id="registerForm">
   <h2>Register an Account</h2>
-  <form method="post" action="/register">
+  <form method="post" th:action="@{/register}">
+
+
     <label for="username">Username:</label><br>
     <input type="text" id="username" name="username" required><br>
-
     <label for="password">Password:</label><br>
     <input type="password" id="password" name="password" required><br>
-
-    <label for="confirm">Please confirm your password:</label><br>
-    <input type="password" id="confirm" name="confirm" required><br>
-
+    <label for="confirmPass">Confirm your password:</label><br>
+    <input type="password" id="confirmPass" name="confirmPass" required><br>
     <label for="first">First name:</label><br>
-    <input type="text" id="first" name="first">required<br>
-
-    <label for="last">Surname:</label><br>
-    <input type="text" id="last" name="last">required<br>
-
+    <input type="text" id="first" name="first"><br>
+    <label for="last">Last name:</label><br>
+    <input type="text" id="last" name="last"><br>
     <label for="email">Email:</label><br>
     <input type="email" id="email" name="email" required><br>
-
     <input type="submit" value="Submit">
   </form>
 </div>
