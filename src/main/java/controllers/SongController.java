@@ -18,7 +18,7 @@ public class SongController {
         this.songDao = songDao;
     }
 
-    @GetMapping("/viewSongs")
+    @GetMapping("/songs")
     public String processRequest(Model model){
         List<Song> songs = songDao.getAllSongs();
         model.addAttribute("songs", songs);
