@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .menu-bar {
+            background-color: #1a1a1a;
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-bar ul {
+            list-style-type: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .menu-bar ul li {
+            margin: 0 15px;
+        }
+
+        .menu-bar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .menu-bar ul li a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .profile-container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            text-align: center;
+            font-size: 24px;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .profile-field {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .profile-label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu-bar">
+    <div th:replace="~{fragments/menu :: menu-bar}"></div>
+</div>
+
+<div class="profile-container">
+    <div class="profile-header">Your Profile</div>
+    <div class="profile-field">
+        <span class="profile-label">Username:</span> <span th:text="${user.username}"></span>
+    </div>
+    <div class="profile-field">
+        <span class="profile-label">First Name:</span> <span th:text="${user.firstName}"></span>
+    </div>
+    <div class="profile-field">
+        <span class="profile-label">Last Name:</span> <span th:text="${user.lastName}"></span>
+    </div>
+    <div class="profile-field">
+        <span class="profile-label">Email:</span> <span th:text="${user.email}"></span>
+    </div>
+    <div class="profile-field">
+        <span class="profile-label">Admin:</span> <span th:text="${user.isAdmin ? 'Yes' : 'No'}"></span>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/styles.css" />
+    <title>Uh oh..</title>
+</head>
+<body>
+<!-- Include the menu bar fragment -->
+<div th:replace="~{Additional/menu :: menu-bar}"></div>
+<h1>error</h1>
+<p th:if="${errType != null}" th:text="|${errType} occurred...|"></p>
+<p th:text="|${errMsg}|"></p>
+</body>
+</html>

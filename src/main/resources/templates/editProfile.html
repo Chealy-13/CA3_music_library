@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Profile</title>
+
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+
+    .form-container {
+        width: 50%;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-header {
+        text-align: center;
+        font-size: 24px;
+        color: #007bff;
+        margin-bottom: 20px;
+    }
+
+    .form-field {
+        margin-bottom: 15px;
+    }
+
+    .form-field label {
+        font-weight: bold;
+        display: block;
+    }
+
+    .form-field input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .form-field input[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .form-field input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+</style>
+<body>
+<div th:replace="~{fragments/menu :: menu-bar}"></div>
+<div class="form-container">
+    <div class="form-header">Edit Your Profile</div>
+    <form method="post" action="/edit">
+
+        <div class="form-field">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" th:value="${user.username}" readonly>
+        </div>
+        <div class="form-field">
+            <label for="first">First Name:</label>
+            <input type="text" id="first" name="first" th:value="${user.firstName}">
+        </div>
+        <div class="form-field">
+            <label for="last">Last Name:</label>
+            <input type="text" id="last" name="last" th:value="${user.lastName}">
+        </div>
+        <div class="form-field">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" th:value="${user.email}" required>
+        </div>
+        <div class="form-field">
+            <input type="submit" value="Save Changes">
+        </div>
+    </form>
