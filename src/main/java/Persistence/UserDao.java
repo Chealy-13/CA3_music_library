@@ -5,6 +5,8 @@ package Persistence;
  */
 import business.User;
 
+import java.sql.*;
+import java.time.LocalDate;
 
 
 public interface UserDao {
@@ -12,7 +14,8 @@ public interface UserDao {
     User login(String username, String password);
     boolean register(User user);
     boolean updateUser(User user); // New method
-
+    boolean updateSubscription(String username, boolean subscriptionStatus, LocalDate subscriptionExpiry);
+}
     //boolean deleteByUsername(String username);
 
     //boolean validateCCInfo(String cardNumber, String expiryDate, String cvv);
@@ -22,5 +25,3 @@ public interface UserDao {
     //boolean isEmailAvailable(String email);
 
     //List<User> getAllUsers();
-
-}
