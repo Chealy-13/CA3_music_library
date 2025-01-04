@@ -1,21 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/styles.css" />
     <title>Title</title>
 </head>
 <body>
-<nav class="menu-bar">
-    <ul>
+<div th:fragment="menu-bar">
 
-        <li><a th:href="@{/}" th:text="#{menu.home}"></a></li>
-        <li th:if="${#ctx.session.currentUser == null}"><a th:href="@{/loginPage}" th:text="#{menu.login}"></a></li>
-        <li th:if="${#ctx.session.currentUser == null}"><a th:href="@{/registerPage}" th:text="#{menu.register}"></a></li>
-        <li th:unless="${#ctx.session.currentUser == null}"><a th:href="@{/profile}" th:text="#{menu.profile}"></a></li>
-        <li th:unless="${#ctx.session.currentUser == null}"><a th:href="@{/editProfile}" th:text="#{menu.editProfile}"></a></li>
-        <li th:unless="${#ctx.session.currentUser == null}"><a th:href="@{/logout}" th:text="#{menu.logout}"></a></li>
-    </ul>
+    <nav class="menu-bar">
+        <ul>
+            <li><a th:href="@{/}" th:text="#{menu.home}"></a></li>
+            <li th:if="${#ctx.session.currentUser == null}"><a th:href="@{/loginPage}" th:text="#{menu.login}"></a></li>
+            <li th:if="${#ctx.session.currentUser == null}"><a th:href="@{/registerPage}" th:text="#{menu.register}"></a></li>
 
-</nav>
+        </ul>
+
+
+
+
+
+
+
+
+
+
+
+    </nav>
+   </div>
 </body>
 </html>
