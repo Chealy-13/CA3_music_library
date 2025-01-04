@@ -1,37 +1,37 @@
 package Persistence;
 
-import business.PlayList;
+import business.Playlist;
 
 import java.util.List;
 
 public class PlayListDoa1Impl implements PlayListDoa1{
     @Override
-    public PlayList getObj(int id) {
+    public Playlist getObj(int id) {
         return null;
     }
 
     @Override
-    public List<PlayList> getAllObj() {
+    public List<Playlist> getAllObj() {
         return null;
     }
 
     @Override
-    public int saveObl(PlayList playList) {
+    public int saveObl(Playlist playList) {
         return 0;
     }
 
     @Override
-    public int insertObj(PlayList playList) {
+    public int insertObj(Playlist playList) {
         return 0;
     }
 
     @Override
-    public int updateObj(PlayList playList) {
+    public int updateObj(Playlist playList) {
         return 0;
     }
 
     @Override
-    public int deleteObj(PlayList playList) {
+    public int deleteObj(Playlist playList) {
         return 0;
     }
 }

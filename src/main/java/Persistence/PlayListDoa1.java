@@ -1,6 +1,6 @@
 package Persistence;
 
-import business.PlayList;
+import business.Playlist;
 
-public interface PlayListDoa1 extends Dao<PlayList>{
+public interface PlayListDoa1 extends Dao<Playlist>{
 }

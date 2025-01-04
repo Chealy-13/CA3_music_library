@@ -11,32 +11,17 @@
 
     <nav class="menu-bar">
         <ul>
-            <!-- Home Link -->
-            <li><a th:href="@{/}" th:text="#{menu.home}"></a></li>
-
-            <!-- Login and Register Links (shown if no user is logged in) -->
-            <li th:if="${#ctx.session.currentUser == null}"><a th:href="@{/loginPage}" th:text="#{menu.login}"></a></li>
-            <li th:if="${#ctx.session.currentUser == null}"><a th:href="@{/registerPage}" th:text="#{menu.register}"></a></li>
-
-            <!-- Profile and Edit Profile Links (shown if a user is logged in) -->
-            <li th:unless="${#ctx.session.currentUser == null}"><a th:href="@{/profile}" th:text="#{menu.profile}"></a></li>
-            <li th:unless="${#ctx.session.currentUser == null}"><a th:href="@{/editProfile}" th:text="#{menu.editProfile}"></a></li>
-            <li th:unless="${#ctx.session.currentUser == null}"><a th:href="@{/logout}" th:text="#{menu.logout}"></a></li>
-
-            <!-- Songs Page Link -->
-            <li><a th:href="@{/songs}" th:text="#{menu.songs}"></a></li>
-
-            <!-- Artists Page Link -->
-            <li><a th:href="@{/artists}" th:text="#{menu.artists}"></a></li>
-
-            <!-- Artist Details Page Link -->
-            <li><a th:href="@{/artistsDetails}" th:text="#{menu.artistsDetails}"></a></li>
-
+            <li><a th:href="@{/}" th:text="#{menu.home}">Home</a></li>
+            <li th:if="${session.currentUser == null}"><a th:href="@{/loginPage}" th:text="#{menu.login}">Login</a></li>
+            <li th:if="${session.currentUser == null}"><a th:href="@{/registerPage}" th:text="#{menu.register}">Register</a></li>
+            <li th:if="${session.currentUser != null}"><a th:href="@{/profile}" th:text="#{menu.profile}">Profile</a></li>
+            <li th:if="${session.currentUser != null}"><a th:href="@{/editProfile}" th:text="#{menu.editProfile}">Edit Profile</a></li>
+            <li th:if="${session.currentUser != null}"><a th:href="@{/logout}" th:text="#{menu.logout}">Logout</a></li>
+            <li><a th:href="@{/songs}" th:text="#{menu.songs}">Songs</a></li>
+            <li><a th:href="@{/artists}" th:text="#{menu.artists}">Artists</a></li>
         </ul>
-
+        <div th:replace="~{Additional/language_menu :: language-menu-bar}"></div>
     </nav>
-    <div th:replace="~{fragments/language_menu :: language-menu-bar}"></div>
-</div>
-
+    </div>
 </body>
 </html>

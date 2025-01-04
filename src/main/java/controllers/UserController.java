@@ -12,11 +12,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
+
 
 @Slf4j
 @Controller
 public class UserController {
-    @PostMapping("register")
+
+    @PostMapping("/register")
     public String register(@RequestParam(name = "username") String username,
                            @RequestParam(name = "password") String password,
                            @RequestParam(name = "confirmPass") String confirm,
@@ -25,6 +28,8 @@ public class UserController {
                            @RequestParam(name = "email") String email,
                            Model model, HttpSession session) {
         String errorMsg = null;
+
+        // Validation
         if (username == null || username.isBlank()) {
             errorMsg = "Cannot register without a username";
         } else if (password == null || password.isBlank()) {
@@ -34,10 +39,14 @@ public class UserController {
         } else if (email == null || email.isBlank()) {
             errorMsg = "Cannot register without a valid email";
         }
+
+        // Handle validation errors
         if (errorMsg != null) {
             model.addAttribute("errorMessage", errorMsg);
             return "registration";
         }
+
+        // Create and save user
         User newUser = User.builder()
                 .username(username)
                 .password(password)
@@ -49,16 +58,16 @@ public class UserController {
 
         UserDao userDao = new UserDaoImpl("database.properties");
         boolean registered = userDao.register(newUser);
+
+        // Handle registration success/failure
         if (registered) {
-            String success = "Registration successful, you are now logged in.";
-            model.addAttribute("message", success);
-            User loggedInUser = userDao.login(username, password);
-            session.setAttribute("currentUser", loggedInUser);
-            return "index";
+            // Save the user in the session
+            session.setAttribute("currentUser", newUser);
+
+            // Redirect to the payment page
+            return "redirect:/payment"; // Ensure you have a `/payment` endpoint mapped in your controller
         } else {
-            log.info("Could not register user with username: " + username + " and email: " + email + ".");
-            String failed = "Username/email address unavailable.";
-            model.addAttribute("errorMessage", failed);
+            model.addAttribute("errorMessage", "Username/email address unavailable.");
             return "registration";
         }
     }
@@ -89,6 +98,7 @@ public class UserController {
             String failed = "Username/password incorrect.";
             model.addAttribute("errorMessage", failed);
             return "login";
+
         }
     }
 
@@ -158,4 +168,50 @@ public class UserController {
             return "editProfile";
         }
     }
-}
+    @GetMapping("/payment")
+    public String showPaymentPage(HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("currentUser");
+        if (loggedInUser == null) {
+            model.addAttribute("errorMessage", "You need to log in to complete payment.");
+            return "login";
+        }
+        return "payment";
+    }
+
+        @PostMapping("/payment/confirm")
+        public String confirmPayment
+                (@RequestParam(name = "cardNumber") String cardNumber,
+                @RequestParam(name = "expiryDate") String expiryDate,
+                @RequestParam(name = "cvv") String cvv,
+                HttpSession session, Model model){
+            User loggedInUser = (User) session.getAttribute("currentUser");
+            if (loggedInUser == null) {
+                model.addAttribute("errorMessage", "You need to log in to complete payment");
+                return "login";
+            }
+
+            if (!cardNumber.matches("^\\d{16}$")) {
+                model.addAttribute("errorMessage", "Invalid card number,must be 16 digits, please try again!");
+                return "payment";
+            }
+
+            if (!expiryDate.matches("^(0[1-9]|1[0-2])\\/\\d{2}$")) {
+                model.addAttribute("errorMessage", "Invalid expiry date, must be in MM/YY format, please try again! ");
+                return "payment";
+            }
+
+            if (!cvv.matches("^\\d{3}$")) {
+                model.addAttribute("errorMessage", "Invalid CVV. Must be 3 digits.");
+                return "payment";
+            }
+
+            loggedInUser.setSubscriptionStatus(true);
+            loggedInUser.setSubscriptionExpiry(LocalDate.now().plusYears(1));
+            UserDao userDao = new UserDaoImpl("database.properties");
+            userDao.updateUser(loggedInUser);
+
+            session.setAttribute("currentUser", loggedInUser);
+            model.addAttribute("message", "Payment successful. Your subscription is active for one year.");
+            return "index";
+        }
+    }
