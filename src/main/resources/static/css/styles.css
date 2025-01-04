@@ -1,5 +1,4 @@
 /* src/main/resources/static/css/styles.css */
-
 * {
     margin: 0;
     padding: 0;
@@ -34,12 +33,4 @@
 .menu-bar ul li a:hover {
     background-color: #555;
     border-radius: 4px;
-}
-
-.dropdown-container {
-    width: 100%;
-}
-
-.dropdown {
-    float: right;
 }
