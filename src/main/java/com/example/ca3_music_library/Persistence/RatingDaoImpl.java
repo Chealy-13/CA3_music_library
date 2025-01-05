@@ -2,6 +2,7 @@ package com.example.ca3_music_library.Persistence;
 
 import com.example.ca3_music_library.business.Rating;
 import com.example.ca3_music_library.business.Song;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static com.example.ca3_music_library.utils.utils.mapRowToSong;
 
+@Component
 public class RatingDaoImpl implements RatingDao {
     private Connection connection;
 
