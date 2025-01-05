@@ -209,6 +209,16 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
         return playlists;
     }
 
+    /**
+     * Adds a song to a specific playlist in the database.
+     * This method inserts a new entry into the playlist_songs table, which links a playlist
+     * (checking its playlistId) with a song (checking its songId). This process makes sure
+     * that the song is linked to the playlist for later retrieval or playback.
+     * @param playlistId the unique id of the playlist to which the song will be added.
+     * @param songId the unique id of the song to be added to the playlist.
+     * @return true if the song was successfully added to the playlist, false otherwise.
+     * @throws SQLException if a database access error occurs or other SQL execution issues.
+     */
     @Override
     public boolean addSongToPlaylist(int playlistId, int songId) {
         String sql = "INSERT INTO playlist_songs (playlistId, songId) VALUES (?, ?)";
@@ -222,6 +232,15 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
         }
     }
 
+    /**
+     * Removes a song from a specific playlist in the database.
+     * This method deletes the link between a playlist and a song in the playlist_songs table,
+     * removing the song from the playlist.
+     * @param playlistId the unique id of the playlist from which the song will be removed.
+     * @param songId the unique id of the song to be removed from the playlist.
+     * @return true if the song was successfully removed from the playlist, false otherwise.
+     * @throws SQLException if a database access error occurs or other SQL execution issues.
+     */
     @Override
     public boolean removeSongFromPlaylist(int playlistId, int songId) {
         String sql = "DELETE FROM playlist_songs WHERE playlistId = ? AND songId = ?";
@@ -235,6 +254,16 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
         }
     }
 
+    /**
+     * gets all songs associated with a specific playlist from the database.
+     * This method performs a query to join the songs and playlist_songs tables,
+     * fetching all songs that belong to the specified playlist. The results are mapped
+     * to Song objects and returned as a list.
+     * @param playlistId the unique id of the playlist whose songs are to be retrieved.
+     * @return a list of Song objects representing the songs in the specified playlist.
+     * Returns an empty list if no songs are found or if an error occurs.
+     * @throws SQLException if a database access error occurs.
+     */
     @Override
     public List<Song> getSongsForPlaylist(int playlistId) {
         String sql = "SELECT s.* FROM songs s " +
