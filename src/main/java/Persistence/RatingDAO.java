@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface RatingDAO {
 
-    boolean rateSong(int songId_, int userId_, int rating_)throws SQLException;
+    boolean rateSong(int songId, int userId, int rating)throws SQLException;
     List<Rating> getRatingsByUser(int userId) throws SQLException;
 
 }
