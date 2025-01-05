@@ -12,10 +12,10 @@ import java.util.List;
 
 import static com.example.ca3_music_library.utils.utils.mapRowToSong;
 
-public class RatingDAOImpl implements RatingDAO {
+public class RatingDaoImpl implements RatingDao {
     private Connection connection;
 
-    public RatingDAOImpl(Connection connection) {
+    public RatingDaoImpl(Connection connection) {
         this.connection = connection;
     }
 
