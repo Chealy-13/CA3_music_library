@@ -1,6 +1,7 @@
 package Persistence;
 
 import business.Rating;
+import business.Song;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static utils.utils.mapRowToSong;
 
 public class RatingDAOImpl implements RatingDAO {
     private Connection connection;
@@ -60,12 +63,7 @@ public class RatingDAOImpl implements RatingDAO {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int ratingId = rs.getInt("ratingId");
-                    int songId = rs.getInt("songId");
-                    int userID = rs.getInt("userId");
-                    int rating = rs.getInt("rating");
-
-                    ratings.add(new Rating(ratingId, songId, userID, rating));
+                    ratings.add(mapRow(rs));
                 }
             }
         } catch (SQLException e) {
@@ -74,5 +72,46 @@ public class RatingDAOImpl implements RatingDAO {
             e.printStackTrace();
         }
         return ratings;
+    }
+
+    @Override
+    public Song getTopRatedSong() {
+        String sql = "SELECT s.*, AVG(r.rating) as avgRating FROM songs s " +
+                "JOIN ratings r ON s.songId = r.songId " +
+                "GROUP BY s.songId ORDER BY avgRating DESC LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapRowToSong(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Song getMostPopularSong() {
+        String sql = "SELECT s.*, COUNT(ps.songId) as playlistCount FROM songs s " +
+                "JOIN playlist_songs ps ON s.songId = ps.songId " +
+                "GROUP BY s.songId ORDER BY playlistCount DESC LIMIT 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapRowToSong(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Rating mapRow(ResultSet rs) throws SQLException {
+        return Rating.builder()
+                .ratingId(rs.getInt("ratingId"))
+                .userId(rs.getInt("userId"))
+                .songId(rs.getInt("songId"))
+                .rating(rs.getInt("rating"))
+                .build();
     }
 }
