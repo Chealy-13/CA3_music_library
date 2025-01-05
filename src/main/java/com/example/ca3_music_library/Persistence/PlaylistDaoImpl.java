@@ -2,6 +2,7 @@ package com.example.ca3_music_library.Persistence;
 
 import com.example.ca3_music_library.business.Playlist;
 import com.example.ca3_music_library.business.Song;
+import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import static com.example.ca3_music_library.utils.utils.mapRowToSong;
  * Implementation of the PlayListDAO interface
  * to manage PlayList.java records in database.
  */
+@Component
 public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
 
     private final Connection connection;
