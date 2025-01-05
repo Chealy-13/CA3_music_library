@@ -46,8 +46,11 @@ public class UserController {
             errorMsg = "Cannot register without a username";
         } else if (password == null || password.isBlank()) {
             errorMsg = "Cannot register without a password";
+        } else if (!password.matches("^(?=.*[A-Z])(?=.*\\d).+$")) {
+            errorMsg = "Password must contain at least one uppercase letter and one number.";
         } else if (confirm == null || confirm.isBlank() || !confirm.equals(password)) {
             errorMsg = "Passwords must match!";
+
         } else if (email == null || email.isBlank()) {
             errorMsg = "Cannot register without a valid email";
         }
