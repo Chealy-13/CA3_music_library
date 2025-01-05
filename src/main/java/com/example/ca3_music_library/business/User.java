@@ -23,6 +23,6 @@ public class User {
     private String lastName;
     private boolean isAdmin;
     private String email;
-    private boolean subscriptionStatus; // To track if the subscription is active
-    private LocalDate subscriptionExpiry; // To track when the subscription expires
+    private boolean subscriptionStatus;
+    private LocalDate subscriptionExpiry;
 }

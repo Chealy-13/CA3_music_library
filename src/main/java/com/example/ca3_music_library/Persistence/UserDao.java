@@ -13,7 +13,7 @@ public interface UserDao {
     User login(String username, String password);
     boolean register(User user);
     boolean updateUser(User user); // New method
-    boolean updateSubscription(String username, boolean subscriptionStatus, LocalDate subscriptionExpiry);
+   // boolean updateSubscription(String username, boolean subscriptionStatus, LocalDate subscriptionExpiry);
 }
     //boolean deleteByUsername(String username);
 
