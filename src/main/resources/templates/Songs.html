@@ -19,9 +19,9 @@
     </thead>
     <tbody>
     <tr th:each="song : ${songs}">
-        <td th:text="${song.title}">Song Title</td>
-        <td th:text="${song.artist}">Artist Name</td>
-        <td th:text="${song.album}">Album Name</td>
+        <td th:text="${song.songTitle}">Song Title</td>
+        <td th:text="${song.artistId}">Artist Name</td>
+        <td th:text="${song.albumId}">Album Name</td>
         <td th:text="${song.additionalInfo}">Additional Info</td>
     </tr>
     </tbody>

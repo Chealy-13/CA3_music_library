@@ -147,8 +147,17 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
         }
         return playlists;
     }
-    
 
+
+    /**
+     * retrieves a list of all public playlists from the database.
+     * this method fetches playlists that are marked as public (when public flag is set to TRUE)
+     * and maps each playlist record from the database into a Playlist object. If any SQL error
+     * occurs during execution, it will be caught, logged, and an empty list will be returned.
+     *
+     * @return a List of Playlist objects representing all public playlists.
+     * If no public playlists exist or an error occurs, an empty list is returned.
+     */
     @Override
     public List<Playlist> getPublicPlaylists() {
         String sql = "SELECT * FROM playlists WHERE isPublic = TRUE";
@@ -167,6 +176,16 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
         return playlists;
     }
 
+    /**
+     * retrieves a list of playlists created by a specific user.
+     * this method fetches all playlists from the database where the creator's ID matches the
+     * specified user ID. Each playlist record is mapped into a Playlist object. If any
+     * SQL error occurs during execution, it will be caught, logged, and an empty list will be returned
+     *
+     * @param userId the ID of the user whose playlists are to be retrieved.
+     * @return a List of Playlist objects representing the playlists created by the user.
+     * if no playlists exist for the user or an error occurs, an empty list is returned.
+     */
     @Override
     public List<Playlist> getUserPlaylists(int userId) {
         String sql = "SELECT * FROM playlists WHERE creatorId = ?";
@@ -186,6 +205,17 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
         return playlists;
     }
 
+    /**
+     * Maps a row from a ResultSet to a Playlist object.
+     * It extracts data from the provided ResultSet and
+     * constructs a new playlist instance using the extracted values.
+     * @param rs the ResultSet containing the current row of data
+     * to be mapped to a playlist object.
+     * @return a Playlist object populated with the values from the current
+     * row of the ResultSet.
+     * @throws SQLException if a database access error occurs or if there is an
+     * issue retrieving data from the ResultSet.
+     */
     private Playlist mapRow(ResultSet rs) throws SQLException {
         return Playlist.builder()
                 .playlistId(rs.getInt("playlistId"))
