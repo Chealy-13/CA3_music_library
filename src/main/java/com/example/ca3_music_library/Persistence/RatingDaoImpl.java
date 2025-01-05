@@ -12,10 +12,10 @@ import java.util.List;
 
 import static com.example.ca3_music_library.utils.utils.mapRowToSong;
 
-public class RatingDAOImpl implements RatingDAO {
+public class RatingDaoImpl implements RatingDao {
     private Connection connection;
 
-    public RatingDAOImpl(Connection connection) {
+    public RatingDaoImpl(Connection connection) {
         this.connection = connection;
     }
 
@@ -30,6 +30,9 @@ public class RatingDAOImpl implements RatingDAO {
      */
     @Override
     public boolean rateSong(int userId, int songId, int rating) throws SQLException {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+        }
         String sql = "INSERT INTO Ratings (userId, songId, rating) VALUES (?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userId);
