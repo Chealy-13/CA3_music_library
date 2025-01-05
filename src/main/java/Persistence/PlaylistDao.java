@@ -24,4 +24,9 @@ public interface PlaylistDao {
 
     List<Playlist> getUserPlaylists(int userId);
 
+    boolean addSongToPlaylist(int playlistId, int songId);
+
+    boolean removeSongFromPlaylist(int playlistId, int songId);
+
+    List<Song> getSongsForPlaylist(int playlistId);
 }

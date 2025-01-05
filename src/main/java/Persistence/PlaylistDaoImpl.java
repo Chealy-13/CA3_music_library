@@ -1,10 +1,14 @@
 package Persistence;
 
 import business.Playlist;
+import business.Song;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static utils.utils.mapRowToPlaylist;
+import static utils.utils.mapRowToSong;
 
 /**
  * Implementation of the PlayListDAO interface
@@ -105,7 +109,7 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
             ps.setInt(1, playlistId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return mapRow(rs);
+                return mapRowToPlaylist(rs);
             }
         } catch (SQLException e) {
             System.out.println("SQL Exception occurred when attempting to prepare SQL for execution.");
@@ -137,7 +141,7 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                playlists.add(mapRow(rs));
+                playlists.add(mapRowToPlaylist(rs));
             }
         } catch (SQLException e) {
             System.out.println("SQL Exception occurred when attempting to prepare SQL for execution.");
@@ -165,7 +169,7 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
         try (Statement stmt = connection.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                playlists.add(mapRow(rs));
+                playlists.add(mapRowToPlaylist(rs));
             }
         } catch (SQLException e) {
             System.out.println("SQL Exception occurred when attempting to prepare SQL for execution.");
@@ -194,7 +198,7 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                playlists.add(mapRow(rs));
+                playlists.add(mapRowToPlaylist(rs));
             }
         } catch (SQLException e) {
             System.out.println("SQL Exception occurred when attempting to prepare SQL for execution.");
@@ -205,24 +209,68 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
         return playlists;
     }
 
-    /**
-     * Maps a row from a ResultSet to a Playlist object.
-     * It extracts data from the provided ResultSet and
-     * constructs a new playlist instance using the extracted values.
-     * @param rs the ResultSet containing the current row of data
-     * to be mapped to a playlist object.
-     * @return a Playlist object populated with the values from the current
-     * row of the ResultSet.
-     * @throws SQLException if a database access error occurs or if there is an
-     * issue retrieving data from the ResultSet.
-     */
-    private Playlist mapRow(ResultSet rs) throws SQLException {
-        return Playlist.builder()
-                .playlistId(rs.getInt("playlistId"))
-                .playlistName(rs.getString("playlistName"))
-                .isPublic(rs.getBoolean("isPublic"))
-                .creatorId(rs.getInt("creatorId"))
-                .build();
+    @Override
+    public boolean addSongToPlaylist(int playlistId, int songId) {
+        String sql = "INSERT INTO playlist_songs (playlistId, songId) VALUES (?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, playlistId);
+            ps.setInt(2, songId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
+
+    @Override
+    public boolean removeSongFromPlaylist(int playlistId, int songId) {
+        String sql = "DELETE FROM playlist_songs WHERE playlistId = ? AND songId = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, playlistId);
+            ps.setInt(2, songId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public List<Song> getSongsForPlaylist(int playlistId) {
+        String sql = "SELECT s.* FROM songs s " +
+                "JOIN playlist_songs ps ON s.songId = ps.songId " +
+                "WHERE ps.playlistId = ?";
+        List<Song> songs = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, playlistId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                songs.add(mapRowToSong(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return songs;
+    }
+
+//    /**
+//     * Maps a row from a ResultSet to a Playlist object.
+//     * It extracts data from the provided ResultSet and
+//     * constructs a new playlist instance using the extracted values.
+//     * @param rs the ResultSet containing the current row of data
+//     * to be mapped to a playlist object.
+//     * @return a Playlist object populated with the values from the current
+//     * row of the ResultSet.
+//     * @throws SQLException if a database access error occurs or if there is an
+//     * issue retrieving data from the ResultSet.
+//     */
+//    private Playlist mapRow(ResultSet rs) throws SQLException {
+//        return Playlist.builder()
+//                .playlistId(rs.getInt("playlistId"))
+//                .playlistName(rs.getString("playlistName"))
+//                .isPublic(rs.getBoolean("isPublic"))
+//                .creatorId(rs.getInt("creatorId"))
+//                .build();
+//    }
 
 }

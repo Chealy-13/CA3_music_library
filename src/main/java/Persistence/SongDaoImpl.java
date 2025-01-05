@@ -1,10 +1,13 @@
 package Persistence;
 
 import business.Song;
-
+import utils.utils;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static utils.utils.mapRowToSong;
+
 /**
  *
  * @author Sophie
@@ -62,7 +65,7 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
                         // Extract the information from the result set
                         // Use extraction method to avoid code repetition!
                         if(rs.next()) {
-                            song = mapRow(rs);
+                            song = mapRowToSong(rs);
                         }
                     } catch (SQLException e) {
                         System.out.println("SQL Exception occurred when executing SQL or processing results.");
@@ -108,7 +111,7 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
                 // Extract the information from the result set
                 // Use extraction method to avoid code repetition!
                 while(rs.next()) {
-                    songs.add(mapRow(rs));
+                    songs.add(mapRowToSong(rs));
                 }
             } catch (SQLException e) {
                 System.out.println("SQL Exception occurred when executing SQL or processing results.");
@@ -148,7 +151,7 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
             try (ResultSet rs = ps.executeQuery()) {
                 // Repeatedly try to get a customer from the resultset
                 while (rs.next()) {
-                    Song s = mapRow(rs);
+                    Song s = mapRowToSong(rs);
                     songs.add(s);
                 }
             } catch (SQLException e) {
@@ -196,7 +199,7 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
                 // Extract the information from the result set
                 // Use extraction method to avoid code repetition!
                 while(rs.next()) {
-                    songs.add(mapRow(rs));
+                    songs.add(mapRowToSong(rs));
                 }
             } catch (SQLException e) {
                 System.out.println("SQL Exception occurred when executing SQL or processing results.");
@@ -243,7 +246,7 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
                 // Extract the information from the result set
                 // Use extraction method to avoid code repetition!
                 while(rs.next()) {
-                    songs.add(mapRow(rs));
+                    songs.add(mapRowToSong(rs));
                 }
             } catch (SQLException e) {
                 System.out.println("SQL Exception occurred when executing SQL or processing results.");
@@ -366,7 +369,7 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    ratedSongs.add(mapRow(rs));
+                    ratedSongs.add(mapRowToSong(rs));
                 }
             }
         } catch (SQLException e) {
@@ -427,7 +430,7 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
                         "GROUP BY s.songId ORDER BY avgRating DESC LIMIT 1")) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    topRatedSong = mapRow(rs);
+                    topRatedSong = mapRowToSong(rs);
                 }
             }
         } catch (SQLException e) {
@@ -456,7 +459,7 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
                         "GROUP BY s.songId ORDER BY ratingCount DESC LIMIT 1")) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    mostPopularSong = mapRow(rs);
+                    mostPopularSong = mapRowToSong(rs);
                 }
             }
         } catch (SQLException e) {
@@ -469,27 +472,27 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
     }
 
 
-    /**
-     * Maps the current row of the given ResultSet to a Song object.
-     * This method extracts the values of each relevant column from the current row of the
-     * ResultSet and uses them to build and return a new Song instance. The
-     * fields include the song ID, song title, album ID, artist ID, and any additional information.
-     * @param rs the ResultSet positioned at the current row to map.
-     * @return a new Song object populated with data from the current row of the ResultSet.
-     * @throws SQLException if a database access error occurs or if the column labels are incorrect.
-     */
-    private Song mapRow(ResultSet rs) throws SQLException {
-        // Get the pieces of a customer from the resultset and create a new Customer
-        Song s = Song.builder()
-                .songID(rs.getInt("songId"))
-                .songTitle(rs.getString("songTitle"))
-                .albumID(rs.getInt("albumId"))
-                .artistID(rs.getInt("artistId"))
-                .additionalInfo(rs.getString("additionalInfo"))
-                .build();
-        // Return the extracted Customer (or null if the resultset was empty)
-        return s;
-    }
+//    /**
+//     * Maps the current row of the given ResultSet to a Song object.
+//     * This method extracts the values of each relevant column from the current row of the
+//     * ResultSet and uses them to build and return a new Song instance. The
+//     * fields include the song ID, song title, album ID, artist ID, and any additional information.
+//     * @param rs the ResultSet positioned at the current row to map.
+//     * @return a new Song object populated with data from the current row of the ResultSet.
+//     * @throws SQLException if a database access error occurs or if the column labels are incorrect.
+//     */
+//    private Song mapRow_song(ResultSet rs) throws SQLException {
+//        // Get the pieces of a customer from the resultset and create a new Customer
+//        Song s = Song.builder()
+//                .songID(rs.getInt("songId"))
+//                .songTitle(rs.getString("songTitle"))
+//                .albumID(rs.getInt("albumId"))
+//                .artistID(rs.getInt("artistId"))
+//                .additionalInfo(rs.getString("additionalInfo"))
+//                .build();
+//        // Return the extracted Customer (or null if the resultset was empty)
+//        return s;
+//    }
 
 
 
