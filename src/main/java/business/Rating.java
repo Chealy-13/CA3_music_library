@@ -1,14 +1,15 @@
 package business;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public class Rating {
-        private int userID;
-        private int songID;
-        private int rating;
+import lombok.*;
 
-
-    }
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Builder
+@AllArgsConstructor
+public class Rating {
+    private int ratingId;
+    private int userId;
+    private int songId;
+    private int rating;
+}
