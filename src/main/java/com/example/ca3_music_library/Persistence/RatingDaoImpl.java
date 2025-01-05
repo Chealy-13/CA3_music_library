@@ -30,6 +30,9 @@ public class RatingDaoImpl implements RatingDao {
      */
     @Override
     public boolean rateSong(int userId, int songId, int rating) throws SQLException {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+        }
         String sql = "INSERT INTO Ratings (userId, songId, rating) VALUES (?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userId);
