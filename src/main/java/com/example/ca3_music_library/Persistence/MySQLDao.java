@@ -3,6 +3,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -52,8 +53,11 @@ public class MySQLDao {
     public MySQLDao(String propertiesFilename){
         properties = new Properties();
         try {
-            String rootPath = Thread.currentThread().getContextClassLoader().getResource(propertiesFilename).getPath();
-            properties.load(new FileInputStream(rootPath));
+            URL resource = Thread.currentThread().getContextClassLoader().getResource(propertiesFilename);
+            if (resource == null) {
+                throw new IllegalStateException("Properties file '" + propertiesFilename + "' not found in classpath.");
+            }
+            String rootPath = resource.getPath();    properties.load(new FileInputStream(rootPath));
         }catch(IOException e){
             log.error("An exception occurred when laoding from properties from: " + propertiesFilename, e);
         }
