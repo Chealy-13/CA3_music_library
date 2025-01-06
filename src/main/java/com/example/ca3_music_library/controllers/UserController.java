@@ -118,7 +118,44 @@ public class UserController {
      * @param model Used to display success or error messages.
      * return Redirects to the home page if payment is successful, or back to the "payment" page if the details are invalid.
      */
-    
+    @PostMapping("/payment/confirm")
+    public String confirmPayment(@RequestParam(name = "cardNumber") String cardNumber,
+                                 @RequestParam(name = "expiryDate") String expiryDate,
+                                 @RequestParam(name = "cvv") String cvv,
+                                 HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("currentUser");
+        if (loggedInUser == null) {
+            model.addAttribute("errorMessage", "You need to log in to complete payment.");
+            return "login";
+        }
+
+        if (!cardNumber.matches("^\\d{16}$")) {
+            model.addAttribute("errorMessage", "Invalid card number. Must be 16 digits.");
+            return "payment";
+        }
+
+        if (!expiryDate.matches("^(0[1-9]|1[0-2])\\/\\d{2}$")) {
+            model.addAttribute("errorMessage", "Invalid expiry date. Must be in MM/YY format.");
+            return "payment";
+        }
+
+        if (!cvv.matches("^\\d{3}$")) {
+            model.addAttribute("errorMessage", "Invalid CVV. Must be 3 digits.");
+            return "payment";
+        }
+
+        loggedInUser.setSubscriptionStatus(true);
+        loggedInUser.setSubscriptionExpiry(LocalDate.now().plusYears(1));
+        UserDao userDao = new UserDaoImpl("database.properties");
+        userDao.updateUser(loggedInUser);
+
+        session.setAttribute("currentUser", loggedInUser);
+        session.setAttribute("successMessage", "Registration and payment successful! Welcome to our service.");
+
+        return "redirect:/";
+    }
+
+
 
     /**
      * This manages the login process by validating user credentials, authenticating the user, and
