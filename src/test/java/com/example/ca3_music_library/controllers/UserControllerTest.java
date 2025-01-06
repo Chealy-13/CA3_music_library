@@ -2,10 +2,13 @@ package com.example.ca3_music_library.controllers;
 
 
 import com.example.ca3_music_library.Persistence.UserDao;
+import com.example.ca3_music_library.business.User;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
@@ -33,7 +36,6 @@ class UserControllerTest {
 
     @Test
     void testRegisterFailureUsernameIsBlank() {
-
         String username = "";
         String password = "Damian2002";
         String confirm = "Damian2002";
@@ -114,4 +116,50 @@ class UserControllerTest {
         assertEquals("Cannot register without a password", model.asMap().get("errorMessage"));
         assertNull(session.getAttribute("currentUser"));
     }
-}
+
+    @Test
+    void testViewProfileNotLoggedIn() {
+        Model model = new ExtendedModelMap();
+        String result = controller.viewProfile(model, session);
+
+        assertEquals("login", result);
+        assertEquals("You need to log in to view your profile.", model.asMap().get("errorMessage"));
+        assertNull(model.asMap().get("user"));
+    }
+    @Test
+    void testShowEditProfilePageLoggedIn() {
+
+        Model model = new ExtendedModelMap();
+        User loggedInUser = new User();
+        loggedInUser.setUsername("testUser");
+        session.setAttribute("currentUser", loggedInUser);
+
+        String result = controller.showEditProfilePage(model, session);
+
+        assertEquals("editProfile", result);
+        assertEquals(loggedInUser, model.asMap().get("user"));
+        assertNull(model.asMap().get("errorMessage"));
+    }
+
+    @Test
+    void testShowEditProfilePageNotLoggedIn() {
+        Model model = new ExtendedModelMap();
+
+        String result = controller.showEditProfilePage(model, session);
+
+        assertEquals("login", result);
+        assertEquals("You need to log in to edit your profile.", model.asMap().get("errorMessage"));
+        assertNull(model.asMap().get("user"));
+    }
+
+    @Test
+    void testUpdateUserDetailsNotLoggedIn() {
+        Model model = new ExtendedModelMap();
+
+        String result = controller.updateUserDetails("username", "first", "last", "email", session, model);
+
+        assertEquals("login", result);
+        assertEquals("You need to log in to edit your profile.", model.asMap().get("errorMessage"));
+    }
+    }
+
