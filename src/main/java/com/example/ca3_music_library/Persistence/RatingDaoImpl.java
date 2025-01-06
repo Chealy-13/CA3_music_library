@@ -14,12 +14,8 @@ import java.util.List;
 import static com.example.ca3_music_library.utils.utils.mapRowToSong;
 
 @Component
-public class RatingDaoImpl implements RatingDao {
-    private Connection connection;
+public class RatingDaoImpl extends MySQLDao implements RatingDao {
 
-    public RatingDaoImpl(Connection connection) {
-        this.connection = connection;
-    }
 
     /**
      * Rates a song and inserts into the Ratings table.
@@ -36,7 +32,8 @@ public class RatingDaoImpl implements RatingDao {
             throw new IllegalArgumentException("Rating must be between 1 and 5.");
         }
         String sql = "INSERT INTO Ratings (userId, songId, rating) VALUES (?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = super.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ps.setInt(2, songId);
             ps.setInt(3, rating);
@@ -64,7 +61,8 @@ public class RatingDaoImpl implements RatingDao {
         String sql = "SELECT * FROM ratings WHERE userId = ?";
 
         List<Rating> ratings = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = super.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -84,7 +82,8 @@ public class RatingDaoImpl implements RatingDao {
         String sql = "SELECT s.*, AVG(r.rating) as avgRating FROM songs s " +
                 "JOIN ratings r ON s.songId = r.songId " +
                 "GROUP BY s.songId ORDER BY avgRating DESC LIMIT 1";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = super.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return mapRowToSong(rs);
@@ -100,7 +99,8 @@ public class RatingDaoImpl implements RatingDao {
         String sql = "SELECT s.*, COUNT(ps.songId) as playlistCount FROM songs s " +
                 "JOIN playlist_songs ps ON s.songId = ps.songId " +
                 "GROUP BY s.songId ORDER BY playlistCount DESC LIMIT 1";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = super.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return mapRowToSong(rs);
