@@ -3,47 +3,115 @@ package com.example.ca3_music_library.controllers;
 
 import com.example.ca3_music_library.Persistence.UserDao;
 import jakarta.servlet.http.HttpSession;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
-    private UserController userController;
-    private UserDao userDaoMock;
-    private Model model;
+
+    private UserController controller;
+    private UserDao userDao;
     private HttpSession session;
 
-
     @Test
-    void testRegister_PasswordsDoNotMatch() {
-        String username = "testUser";
-        String password = "Password123";
-        String confirmPassword = "Password6";
+    void testRegisterSuccess() {
+        String username = "DamianUser";
+        String password = "Damian2002";
+        String confirm = "Damian2002";
+        String first = "Damian";
+        String last = "Magiera";
+        String email = "Damian@example.com";
+        Model model = new ExtendedModelMap();
 
-        String result = userController.register(username, password, confirmPassword, null, null, "test@example.com", model, session);
+        String result = controller.register(username, password, confirm, first, last, email, model, session);
 
-        Mockito.verify(model).addAttribute("errorMessage", "Passwords must match!");
-        assertEquals("registration", result);
+        assertEquals("redirect:/payment", result);
+        assertNotNull(session.getAttribute("currentUser"));
+        assertTrue(model.asMap().isEmpty());
     }
 
     @Test
-    void testRegister_PasswordWithoutUppercaseOrNumber() {
-        HttpSession session = mock(HttpSession.class);
-        Model model = mock(Model.class);
+    void testRegisterFailureUsernameIsBlank() {
 
+        String username = "";
+        String password = "Damian2002";
+        String confirm = "Damian2002";
+        String email = "Damian@example.com";
+        Model model = new ExtendedModelMap();
+
+        String result = controller.register(username, password, confirm, null, null, email, model, session);
+
+        assertEquals("registration", result);
+        assertEquals("Cannot register without a username", model.asMap().get("errorMessage"));
+        assertNull(session.getAttribute("currentUser"));
+    }
+
+    @Test
+    void testRegisterFailurePasswordAreNotMatching() {
+
+        String username = "DamianUse";
+        String password = "hello";
+        String confirm = "bye";
+        String email = "Damian@example.com";
+        Model model = new ExtendedModelMap();
+
+        String result = controller.register(username, password, confirm, null, null, email, model, session);
+
+        assertEquals("registration", result);
+        assertEquals("Passwords must match!", model.asMap().get("errorMessage"));
+        assertNull(session.getAttribute("currentUser"));
+    }
+
+    @Test
+    void testLoginSuccess() {
         String username = "Damian";
-        String password = "password";
-        String confirmPass = "password";
-        String first = "Damian";
-        String last = "Magiera";
-        String email = "test@example.com";
+        String password = "Damian2002";
+        Model model = new ExtendedModelMap();
+        String result = controller.login(username, password, model, session);
 
-        String result = userController.register(username, password, confirmPass, first, last, email, model, session);
-        assertEquals("registration", result, "Should go back to registration page for invalid password.");
-        verify(model).addAttribute("errorMessage", "Password must contain at least one uppercase letter and one number!");
+        assertEquals("index", result);
+        assertEquals("Login successful", model.asMap().get("message"));
+        assertNotNull(session.getAttribute("currentUser"));
+    }
+
+    @Test
+    void testLoginFailureIncorrectCredentials() {
+        String username = "Damian";
+        String password = "wrongPassword";
+        Model model = new ExtendedModelMap();
+
+        String result = controller.login(username, password, model, session);
+
+        assertEquals("login", result);
+        assertEquals("Username/password incorrect.", model.asMap().get("errorMessage"));
+        assertNull(session.getAttribute("currentUser"));
+    }
+
+    @Test
+    void testLoginFailureBlankUsername() {
+        String username = "";
+        String password = "Damian2002";
+        Model model = new ExtendedModelMap();
+
+        String result = controller.login(username, password, model, session);
+
+        assertEquals("login", result);
+        assertEquals("Cannot register without a username", model.asMap().get("errorMessage"));
+        assertNull(session.getAttribute("currentUser"));
+    }
+
+    @Test
+    void testLoginFailureBlankPassword() {
+        String username = "Damian";
+        String password = "";
+        Model model = new ExtendedModelMap();
+
+
+        String result = controller.login(username, password, model, session);
+
+        assertEquals("login", result);
+        assertEquals("Cannot register without a password", model.asMap().get("errorMessage"));
+        assertNull(session.getAttribute("currentUser"));
     }
 }
