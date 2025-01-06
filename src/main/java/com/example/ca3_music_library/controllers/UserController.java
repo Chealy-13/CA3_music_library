@@ -17,6 +17,11 @@ import java.time.LocalDate;
 @Slf4j
 @Controller
 public class UserController {
+    private final UserDao userDao;
+
+    public UserController() {
+        this.userDao = new UserDaoImpl("database.properties"); // Initialize with database properties
+    }
     /**
      * User registration takes care of validating the input data, creating a new user,
      * and if successful redirect them to the payment page
@@ -31,7 +36,7 @@ public class UserController {
      * @param session  The current HTTP session to store the user data if registration is successful.
      * @return Redirects to the "payment" page for subscription or returns the "registration" page if validation fails.
      */
-    @PostMapping("/register")
+    @PostMapping("register")
     public String register(@RequestParam(name = "username") String username,
                            @RequestParam(name = "password") String password,
                            @RequestParam(name = "confirmPass") String confirm,
@@ -40,6 +45,7 @@ public class UserController {
                            @RequestParam(name = "email") String email,
                            Model model, HttpSession session) {
         String errorMsg = null;
+
         // Validation
         if (username == null || username.isBlank()) {
             errorMsg = "Cannot register without a username";
@@ -49,16 +55,17 @@ public class UserController {
             errorMsg = "Password must contain at least one uppercase letter and one number.";
         } else if (confirm == null || confirm.isBlank() || !confirm.equals(password)) {
             errorMsg = "Passwords must match!";
-
         } else if (email == null || email.isBlank()) {
             errorMsg = "Cannot register without a valid email";
         }
+
         // Handle validation errors
         if (errorMsg != null) {
             model.addAttribute("errorMessage", errorMsg);
             return "registration";
         }
 
+        // Create and save user
         User newUser = User.builder()
                 .username(username)
                 .password(password)
@@ -68,17 +75,87 @@ public class UserController {
                 .isAdmin(false)
                 .build();
 
-        UserDao userDao = new UserDaoImpl("database.properties");
-        boolean registered = userDao.register(newUser);
-        if (registered) {
-            session.setAttribute("currentUser", newUser);
-
-            return "index";
-        } else {
-            model.addAttribute("errorMessage", "Username/email address unavailable.");
+        try {
+            boolean registered = userDao.register(newUser);
+            if (registered) {
+                session.setAttribute("currentUser", newUser);
+                // Redirect to payment page
+                return "redirect:/payment";
+            }
+        } catch (IllegalStateException e) {
+            // Handle duplicate username or email error
+            model.addAttribute("errorMessage", "Username or email already exists. Please choose a different one.");
             return "registration";
         }
+
+        // Default case (shouldn't be reached)
+        model.addAttribute("errorMessage", "An unexpected error occurred. Please try again.");
+        return "registration";
     }
+
+    /**
+     * Displays the payment page to allow users to complete their subscription.
+     *
+     * @param session   The current HTTP session to validate the user's login status.
+     * @param model     The model object to handle messages or errors.
+     * Returns the "payment" view if the user is logged in, otherwise redirects to the login html page.
+     */
+    @GetMapping("/payment")
+    public String showPaymentPage(HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("currentUser");
+        if (loggedInUser == null) {
+            model.addAttribute("errorMessage", "You need to log in to complete payment.");
+            return "login";
+        }
+        return "payment"; // Ensure the payment.html file exists
+    }
+    /**
+     * Processes payment by checking the user's credit card details: card number, expiry date, and CVV
+     * @param cardNumber The 16-digit credit card number entered by the user.
+     * @param expiryDate The card's expiry date in MM/YY format.
+     * @param cvv The 3-digit security code (CVV) on the card.
+     * @param session The current HTTP session to get the logged-in user's information.
+     * @param model Used to display success or error messages.
+     * return Redirects to the home page if payment is successful, or back to the "payment" page if the details are invalid.
+     */
+    @PostMapping("/payment/confirm")
+    public String confirmPayment(@RequestParam(name = "cardNumber") String cardNumber,
+                                 @RequestParam(name = "expiryDate") String expiryDate,
+                                 @RequestParam(name = "cvv") String cvv,
+                                 HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("currentUser");
+        if (loggedInUser == null) {
+            model.addAttribute("errorMessage", "You need to log in to complete payment.");
+            return "login";
+        }
+
+        if (!cardNumber.matches("^\\d{16}$")) {
+            model.addAttribute("errorMessage", "Invalid card number. Must be 16 digits.");
+            return "payment";
+        }
+
+        if (!expiryDate.matches("^(0[1-9]|1[0-2])\\/\\d{2}$")) {
+            model.addAttribute("errorMessage", "Invalid expiry date. Must be in MM/YY format.");
+            return "payment";
+        }
+
+        if (!cvv.matches("^\\d{3}$")) {
+            model.addAttribute("errorMessage", "Invalid CVV. Must be 3 digits.");
+            return "payment";
+        }
+
+        loggedInUser.setSubscriptionStatus(true);
+        loggedInUser.setSubscriptionExpiry(LocalDate.now().plusYears(1));
+        UserDao userDao = new UserDaoImpl("database.properties");
+        userDao.updateUser(loggedInUser);
+
+        session.setAttribute("currentUser", loggedInUser);
+        session.setAttribute("successMessage", "Registration and payment successful! Welcome to our service.");
+
+        return "redirect:/";
+    }
+
+
 
     /**
      * This manages the login process by validating user credentials, authenticating the user, and
@@ -165,9 +242,9 @@ public class UserController {
         User loggedInUser = (User) session.getAttribute("currentUser");
         if (loggedInUser == null) {
             model.addAttribute("errorMessage", "You need to log in to edit your profile.");
-            return "login";
+            return "login"; // Redirect to login if user is not logged in
         }
-        model.addAttribute("user", loggedInUser);
+        model.addAttribute("user", loggedInUser); // Pass the user to the view
         return "editProfile";
     }
 
@@ -189,34 +266,35 @@ public class UserController {
                                     @RequestParam(name = "last", required = false) String last,
                                     @RequestParam(name = "email") String email,
                                     HttpSession session, Model model) {
-        log.info("POST /edit triggered with username: {}, first: {}, last: {}, email: {}", username, first, last, email);
-
-
         User loggedInUser = (User) session.getAttribute("currentUser");
         if (loggedInUser == null) {
-            log.error("No user found in session. Redirecting to login page.");
             model.addAttribute("errorMessage", "You need to log in to edit your profile.");
             return "login";
         }
+
+        // Update logged-in user fields
         loggedInUser.setUsername(username);
         loggedInUser.setFirstName(first);
         loggedInUser.setLastName(last);
         loggedInUser.setEmail(email);
 
+        // Persist to database
         UserDao userDao = new UserDaoImpl("database.properties");
         boolean updated = userDao.updateUser(loggedInUser);
 
         if (updated) {
-            log.info("This profile has been updated: {}", username);
-            session.setAttribute("currentUser", loggedInUser);
+            session.setAttribute("currentUser", loggedInUser); // Update session
             model.addAttribute("message", "Your profile has been updated successfully.");
-            return "index";
+            return "redirect:/profile"; // Redirect to profile page
         } else {
-            log.error("Failed to update profile for user: {}", username);
-            model.addAttribute("errorMessage", "Failed to update your profile, please try again!");
-            return "editProfile";
+            model.addAttribute("errorMessage", "Failed to update your profile. Please try again.");
+            return "editProfile"; // Return to edit profile page on failure
         }
+
     }
+}
+
+
 
     /**
      * Displays the payment page to allow users to complete their subscription.
@@ -225,4 +303,3 @@ public class UserController {
      * @param model     The model object to handle messages or errors.
      * Returns the "payment" view if the user is logged in, otherwise redirects to the login html page.
      */
-}
