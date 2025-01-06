@@ -7,5 +7,10 @@
 </head>
 <body>
 <div th:replace="~{Additional/menu :: menu-bar}"></div>
+<div>
+    <div th:if="${successMessage != null}" class="alert alert-success">
+        <p th:text="${successMessage}"></p>
+    </div>
+</div>
 </body>
 </html>
