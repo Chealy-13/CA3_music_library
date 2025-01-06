@@ -2,26 +2,77 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/styles.css" />
     <title>Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .menu-bar {
+            background-color: #007bff;
+            padding: 10px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-bar ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .menu-bar ul li {
+            margin: 0 15px;
+        }
+
+        .menu-bar ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .menu-bar ul li a:hover {
+            background-color: #0056b3;
+            color: #fff;
+        }
+
+        .menu-bar ul li a.active {
+            background-color: #0056b3;
+            color: #fff;
+        }
+
+        .menu-bar .language-menu {
+            position: absolute;
+            right: 20px;
+        }
+    </style>
 </head>
 <body>
 
 <div th:fragment="menu-bar">
-
     <nav class="menu-bar">
         <ul>
             <li><a th:href="@{/}" th:text="#{menu.home}">Home</a></li>
+            <li><a th:href="@{/greeting}" th:text="#{menu.greeting}">Greeting</a></li>
             <li th:if="${session.currentUser == null}"><a th:href="@{/loginPage}" th:text="#{menu.login}">Login</a></li>
             <li th:if="${session.currentUser == null}"><a th:href="@{/registerPage}" th:text="#{menu.register}">Register</a></li>
             <li th:if="${session.currentUser != null}"><a th:href="@{/profile}" th:text="#{menu.profile}">Profile</a></li>
             <li th:if="${session.currentUser != null}"><a th:href="@{/editProfile}" th:text="#{menu.editProfile}">Edit Profile</a></li>
+            <li><a th:href="@{/renew}" th:text="#{menu.renewSubscription}">Renew Subscription</a></li>
             <li th:if="${session.currentUser != null}"><a th:href="@{/logout}" th:text="#{menu.logout}">Logout</a></li>
             <li><a th:href="@{/songs}" th:text="#{menu.songs}">Songs</a></li>
             <li><a th:href="@{/artists}" th:text="#{menu.artists}">Artists</a></li>
         </ul>
-        <div th:replace="~{Additional/language_menu :: language-menu-bar}"></div>
+        <div th:replace="~{Additional/language_menu :: language-menu-bar}" class="language-menu"></div>
     </nav>
-    </div>
+</div>
+
 </body>
 </html>
