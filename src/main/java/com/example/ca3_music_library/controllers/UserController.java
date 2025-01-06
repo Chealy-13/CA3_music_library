@@ -400,8 +400,20 @@ public class UserController {
 
         return "redirect:/";
     }
-}
 
+    @GetMapping("/greeting")
+    public String showGreeting(HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("currentUser");
+
+        if (loggedInUser != null) {
+            model.addAttribute("greetingMessage", "Welcome back, " + loggedInUser.getFirstName() + "!");
+        } else {
+            model.addAttribute("greetingMessage", "Welcome to our music library!");
+        }
+
+        return "greeting";
+    }
+}
 /**
  * Displays the payment page to allow users to complete their subscription.
  *
