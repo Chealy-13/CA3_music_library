@@ -188,6 +188,12 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
     }
 
 }
+
+
+/**
+UPDATES METHODS FROM LAST PROJECT
+ */
+
 //@Override
 //public boolean RegisterU(String username, String password, String email) {
     //This ine is used instert row to "users" table with values: useranme, password, email.
