@@ -184,19 +184,28 @@ public class AlbumDaoImpl extends MySQLDao implements AlbumDao {
         List<Album> albums = new ArrayList<>();
         Connection conn = super.getConnection();
 
-        String sql = "SELECT * FROM album";
+        String sql = "SELECT a.*, ar.name AS artistName " +
+                "FROM album a " +
+                "JOIN artists ar ON a.artistId = ar.artistId";
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Album album = mapRow(rs);
+                Album album = Album.builder()
+                        .albumId(rs.getInt("albumId"))
+                        .albumTitle(rs.getString("albumTitle"))
+                        .artistId(rs.getInt("artistId"))
+                        .releaseDate(rs.getDate("releaseDate"))
+                        .artistName(rs.getString("artistName"))
+                        .build();
+
                 album.setSongs(getSongsForAlbum(album.getAlbumId()));
                 albums.add(album);
             }
         } catch (SQLException e) {
-            System.out.println("SQL Exception occurred when retrieving all albums.");
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("SQL Exception occurred when retrieving all albums.");
+            System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
         } finally {
             super.freeConnection(conn);
