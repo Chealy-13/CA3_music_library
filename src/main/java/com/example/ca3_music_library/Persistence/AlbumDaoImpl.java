@@ -172,6 +172,39 @@ public class AlbumDaoImpl extends MySQLDao implements AlbumDao {
     }
 
     /**
+     * Retrieves a list of all albums from the database.
+     * It executes a SQL query to fetch all album records and maps each record
+     * to an Album object. If an album has associated songs, they are also retrieved.
+     * @return a List of Album objects containing all albums in the database.
+     * Returns an empty list if no albums are found or if an error occurs.
+     * @throws SQLException if a database access error occurs or the SQL statement is invalid.
+     */
+    @Override
+    public List<Album> getAllAlbums() {
+        List<Album> albums = new ArrayList<>();
+        Connection conn = super.getConnection();
+
+        String sql = "SELECT * FROM album";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Album album = mapRow(rs);
+                album.setSongs(getSongsForAlbum(album.getAlbumId()));
+                albums.add(album);
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Exception occurred when retrieving all albums.");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            super.freeConnection(conn);
+        }
+
+        return albums;
+    }
+    /**
      * Maps a row from a ResultSet to an Album object.
      * It extracts data from the provided ResultSet and
      * constructs a new Album instance using the extracted values.
