@@ -31,4 +31,18 @@ public interface SongDao {
 
     Song getMostPopularSong();
 
+    List<Song> searchSongs(String query);
+
+    Song getRandomSong();
+
+    /*
+     * Feature: Random Song selector/generator
+     * Developer: Sophie Nardone
+     * Description: The Random Song Selector feature randomly selects a song from the music library database and displays it to the user
+     *
+     * - Created a method called getRandomSong to select a random song from the songs table
+     */
+
+
+
 }

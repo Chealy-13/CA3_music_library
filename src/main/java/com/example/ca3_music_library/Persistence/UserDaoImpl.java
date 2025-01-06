@@ -34,36 +34,36 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
     @Override
     public User login(String username, String password) {
         if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("Username required to log in");
+            throw new IllegalArgumentException("You must enter a username to login");
         }
         if (password == null || password.isBlank()) {
-            throw new IllegalArgumentException("Password required to log in");
+            throw new IllegalArgumentException("You must enter a password to login");
         }
 
-        Connection conn = super.getConnection();
-        User result = null;
-        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT * FROM users WHERE username = ? AND password COLLATE utf8mb4_bin = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
             ps.setString(2, password);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    result = User.builder()
+                    return User.builder()
                             .username(rs.getString("username"))
-                            .email(rs.getString("email"))
+                            .password(rs.getString("password"))
                             .firstName(rs.getString("firstName"))
                             .lastName(rs.getString("lastName"))
+                            .email(rs.getString("email"))
                             .isAdmin(rs.getBoolean("isAdmin"))
+                            .subscriptionStatus(rs.getBoolean("subscriptionStatus"))
+                            .subscriptionExpiry(rs.getDate("subscriptionExpiry") != null ? rs.getDate("subscriptionExpiry").toLocalDate() : null)
                             .build();
                 }
             }
         } catch (SQLException e) {
-            log.error("An error occurred when logging in user with username: " + username, e);
+            log.error("An error occurred when logging in user with username: {}", username, e);
         }
-
-        super.freeConnection(conn);
-        return result;
+        return null;
     }
 
     /**
@@ -101,38 +101,46 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
                 ps.setBoolean(6, user.isAdmin());
 
                 int rowsAffected = ps.executeUpdate();
-                if (rowsAffected > 0) {
-                    log.info("User {} successfully registered.", user.getUsername());
-                    return true;
-                }
+                return rowsAffected > 0;
+
+            } catch (SQLIntegrityConstraintViolationException e) {
+                log.error("Username or email already exists: {}", user.getUsername());
+                throw new IllegalStateException("Username or email already exists. Please choose a different one.");
             }
 
-        } catch (SQLIntegrityConstraintViolationException e) {
-            log.error("Constraint violation when registering user: {}", user.getUsername(), e);
-            throw new IllegalStateException("Username or email is already in use.");
         } catch (SQLException e) {
             log.error("SQL exception when registering user: {}", user.getUsername(), e);
         }
         return false;
     }
 
-    private boolean validateUser(User u) {
-        return u != null
-                && u.getUsername() != null && !u.getUsername().isBlank()
-                && u.getPassword() != null && !u.getPassword().isBlank()
-                && u.getEmail() != null && !u.getEmail().isBlank();
-    }
-/**
- * Updates the subscription status and expiry date for a user in the database.
- * Firstly connects to the database and prepares an SQL `UPDATE` statement.
- * Then updates the `subscriptionStatus` and `subscriptionExpiry` fields for the specified username.
- * Lastly executes the SQL statement and returns whether the operation was successful.
- * @param username The username of the user whose subscription details need to be updated.
- * @param subscriptionStatus The new subscription status.
- * @param subscriptionExpiry The new subscription expiry date as a (localdate).
- * @return returns if the subscription details are successfully updated false otherwise.
- */
 
+    /**
+     * Updates the subscription status and expiry date for a user in the database.
+     * Firstly connects to the database and prepares an SQL `UPDATE` statement.
+     * Then updates the `subscriptionStatus` and `subscriptionExpiry` fields for the specified username.
+     * Lastly executes the SQL statement and returns whether the operation was successful.
+     * @param username The username of the user whose subscription details need to be updated.
+     * @param subscriptionStatus The new subscription status.
+     * @param subscriptionExpiry The new subscription expiry date as a (localdate).
+     * @return returns if the subscription details are successfully updated false otherwise.
+     */
+    @Override
+    public boolean updateSubscription(String username, boolean subscriptionStatus, LocalDate subscriptionExpiry) {
+        String sql = "UPDATE users SET subscriptionStatus = ?, subscriptionExpiry = ? WHERE username = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, subscriptionStatus);
+            ps.setDate(2, Date.valueOf(subscriptionExpiry));
+            ps.setString(3, username);
+
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            log.error("Error updating subscription for user: {}", username, e);
+        }
+        return false;
+    }
     /**
      * The ppoint of this method is to update the user's details in the database, including their personal information and subscription details.
      * It does the following
@@ -140,11 +148,12 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
      * Then executes an SQL
      * Lastly returns whether the update operation was successful.
      *
-     * @param user The {@link User} object containing updated information for the user. This includes:
+     * @param user The object containing updated information for the user. This includes:
      *             First name, Last name, Email, Subscription status, Subscription expiry date (nullable, can be {@code null} if no expiry date is set)
      *             Username (used to identify the user in the database)
      * @return true if the user details were successfully updated in the database and false otherwise.
      */
+
     @Override
     public boolean updateUser(User user) {
         String sql = "UPDATE users SET firstName = ?, lastName = ?, email = ?, subscriptionStatus = ?, subscriptionExpiry = ? WHERE username = ?";
@@ -165,7 +174,15 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
         return false;
     }
 
+    private boolean validateUser(User user) {
+        return user != null &&
+                user.getUsername() != null && !user.getUsername().isBlank() &&
+                user.getPassword() != null && !user.getPassword().isBlank() &&
+                user.getEmail() != null && !user.getEmail().isBlank();
+    }
 }
+
+
 
 //@Override
 //public boolean RegisterU(String username, String password, String email) {
