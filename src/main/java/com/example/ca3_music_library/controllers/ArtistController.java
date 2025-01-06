@@ -19,7 +19,7 @@ public class ArtistController {
         this.artistDao = artistDao;
     }
 
-    @GetMapping("/viewArtists")
+    @GetMapping("/artists")
     public String viewArtists(Model model){
      List<Artist> artists = artistDao.getAllArtists();
      model.addAttribute("artists", artists);

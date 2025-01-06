@@ -31,4 +31,8 @@ public interface SongDao {
 
     Song getMostPopularSong();
 
+    List<Song> searchSongs(String query);
+
+
+
 }

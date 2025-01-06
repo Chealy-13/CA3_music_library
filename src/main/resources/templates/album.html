@@ -7,14 +7,14 @@
 </head>
 <body>
 <div class="container mt-5">
-<h1>Artists</h1>
-<ul>
-    <th:block th:each="artist : ${artists}">
-        <li>
-            <a th:href="@{/viewArtist/{id}(id=${artist.artistID})}" th:text="${artist.artistName}">Artist Name</a>
-        </li>
-    </th:block>
-</ul>
+    <h1>Artists</h1>
+    <ul>
+<!--        <th:block th:each="album : ${albums}">-->
+            <li>
+<!--                <a th:href="@{/viewAlbum/{id}(id=${artist.artistID})}" th:text="${artist.artistName}">Artist Name</a>-->
+            </li>
+        </th:block>
+    </ul>
 </div>
 </body>
 </html>

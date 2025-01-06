@@ -182,10 +182,10 @@ public class ArtistDaoImpl extends MySQLDao implements ArtistDao {
                 while (rs.next()) {
                     Song song = new Song(
                             rs.getInt("songId"),
-                            rs.getString("title"),
+                            rs.getString("songTitle"),
                             rs.getInt("artistId"),
-                            rs.getInt("album"),
-                            rs.getString("genre")
+                            rs.getInt("albumId"),
+                            rs.getString("additionalInfo")
                     );
                     songs.add(song);
                 }
