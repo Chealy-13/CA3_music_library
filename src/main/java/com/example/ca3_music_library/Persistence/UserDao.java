@@ -20,7 +20,7 @@ public interface UserDao {
     boolean updateUser(User user); // General user update method
 
 }
-//boolean deleteByUsername(String username);
+     //boolean deleteByUsername(String username);
 
     //boolean validateCCInfo(String cardNumber, String expiryDate, String cvv);
 
