@@ -38,6 +38,6 @@ public class Album {
     private String albumTitle;
     private int artistId;
     private Date releaseDate;
-
+    private String artistName;
     private List<Song> songs;
 }

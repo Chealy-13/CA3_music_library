@@ -7,11 +7,17 @@
 </head>
 <body>
 <div class="container mt-5">
-<h1>Artists</h1>
-<ul>
+    <div class="text-center mb-4">
+<h1 class="display-4">Artists</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+<ul class="list-group">
     <th:block th:each="artist : ${artists}">
-        <li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
             <a th:href="@{/viewArtist/{id}(id=${artist.artistID})}" th:text="${artist.artistName}">Artist Name</a>
+            <span class="badge bg-primary rounded-pill">ID: <span th:text="${artist.artistID}">123</span></span>
         </li>
     </th:block>
 </ul>
