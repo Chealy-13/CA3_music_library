@@ -2,6 +2,7 @@ package com.example.ca3_music_library.Persistence;
 
 import com.example.ca3_music_library.business.Playlist;
 import com.example.ca3_music_library.business.Song;
+import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,19 +15,20 @@ import static com.example.ca3_music_library.utils.utils.mapRowToSong;
  * Implementation of the PlayListDAO interface
  * to manage PlayList.java records in database.
  */
+@Component
 public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
 
-    private final Connection connection;
+//    private final Connection connection;
 
     /**
      * Constructs a PlayListDAOImpl with the specified database connection.
      *
      * @param conn is the Connection object to connect to the database.
      */
-    public PlaylistDaoImpl(Connection conn) {
-        super();
-        this.connection = conn;
-    }
+//    public PlaylistDaoImpl(Connection conn) {
+//        super();
+//        this.connection = conn;
+//    }
 
     /**
      * creates a new playlist in the database.
@@ -38,7 +40,8 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
     @Override
     public boolean createPlaylist(Playlist playlist) {
         String sql = "INSERT INTO playlists (playlistName, isPublic, creatorId) VALUES (?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, playlist.getPlaylistName());
             ps.setBoolean(2, playlist.isPublic());
             ps.setInt(3, playlist.getCreatorId());
@@ -61,7 +64,8 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
     @Override
     public boolean updatePlaylist(Playlist playlist) {
         String sql = "UPDATE playlists SET playlistName = ?, isPublic = ? WHERE playlistId = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, playlist.getPlaylistName());
             ps.setBoolean(2, playlist.isPublic());
             ps.setInt(3, playlist.getPlaylistId());
@@ -82,7 +86,8 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
     @Override
     public boolean deletePlaylist(int playlistId) {
         String sql = "DELETE FROM playlists WHERE playlistId = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, playlistId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -105,7 +110,8 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
     @Override
     public Playlist getPlaylistById(int playlistId) {
         String sql = "SELECT * FROM playlists WHERE playlistId = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, playlistId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -137,7 +143,8 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
     public List<Playlist> getAllPlaylists(int userId) {
         String sql = "SELECT * FROM playlists WHERE isPublic = TRUE OR creatorId = ?";
         List<Playlist> playlists = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -166,8 +173,9 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
     public List<Playlist> getPublicPlaylists() {
         String sql = "SELECT * FROM playlists WHERE isPublic = TRUE";
         List<Playlist> playlists = new ArrayList<>();
-        try (Statement stmt = connection.createStatement()) {
-            ResultSet rs = stmt.executeQuery(sql);
+        try (Connection conn = super.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 playlists.add(mapRowToPlaylist(rs));
             }
@@ -194,7 +202,8 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
     public List<Playlist> getUserPlaylists(int userId) {
         String sql = "SELECT * FROM playlists WHERE creatorId = ?";
         List<Playlist> playlists = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = super.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -222,7 +231,8 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
     @Override
     public boolean addSongToPlaylist(int playlistId, int songId) {
         String sql = "INSERT INTO playlist_songs (playlistId, songId) VALUES (?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = super.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, playlistId);
             ps.setInt(2, songId);
             return ps.executeUpdate() > 0;
@@ -244,7 +254,8 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
     @Override
     public boolean removeSongFromPlaylist(int playlistId, int songId) {
         String sql = "DELETE FROM playlist_songs WHERE playlistId = ? AND songId = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = super.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, playlistId);
             ps.setInt(2, songId);
             return ps.executeUpdate() > 0;
@@ -270,7 +281,8 @@ public class PlaylistDaoImpl extends MySQLDao implements PlaylistDao {
                 "JOIN playlist_songs ps ON s.songId = ps.songId " +
                 "WHERE ps.playlistId = ?";
         List<Song> songs = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection conn = super.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, playlistId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {

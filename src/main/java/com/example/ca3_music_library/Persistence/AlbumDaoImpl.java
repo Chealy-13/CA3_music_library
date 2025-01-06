@@ -7,6 +7,7 @@ package com.example.ca3_music_library.Persistence;
 
 import com.example.ca3_music_library.business.Album;
 import com.example.ca3_music_library.business.Song;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+@Component
 public class AlbumDaoImpl extends MySQLDao implements AlbumDao {
 
     /**
