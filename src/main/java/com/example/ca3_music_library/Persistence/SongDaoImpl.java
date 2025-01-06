@@ -497,6 +497,23 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
         return songs;
     }
 
+    @Override
+    public Song getRandomSong() {
+        Song song = null;
+        Connection conn = super.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM songs ORDER BY RAND() LIMIT 1")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    song = mapRowToSong(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error selecting random song: " + e.getMessage());
+        } finally {
+            super.freeConnection(conn);
+        }
+        return song;
+    }
 
 
 
