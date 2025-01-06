@@ -472,6 +472,16 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
         }
         return mostPopularSong;
     }
+    /**
+     * Searches for songs in the database based on the given query.
+     * The search is performed by matching the query against the song title, artist ID, and album ID.
+     *
+     * @param query the search term to look for in the songTitle, artistId, or albumId.
+     * @return a list of Song objects that match the search.
+     *         If no songs match, an empty list is returned.
+     *
+     * @throws SQLException if there is an error while executing the SQL query.
+     */
     @Override
     public List<Song> searchSongs(String query) {
         List<Song> songs = new ArrayList<>();
@@ -496,7 +506,14 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
         }
         return songs;
     }
-
+    /**
+     * Retrieves a random song from the database.
+     * The selection is performed using the SQL `ORDER BY RAND()` clause, which selects a single random song.
+     *
+     * @return a {@code Song} object representing the randomly selected song, or {@code null} if no songs are found in the database.
+     *
+     * @throws SQLException if there is an error while executing the SQL query.
+     */
     @Override
     public Song getRandomSong() {
         Song song = null;
