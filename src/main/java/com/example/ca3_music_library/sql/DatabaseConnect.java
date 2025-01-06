@@ -25,7 +25,7 @@ public class DatabaseConnect {
                 System.out.println("Database is connected successfull");
             }
         } catch (SQLException e) {
-            //throw new RuntimeException(e);
+
             System.out.println("Error Occured   " + e.getMessage());
         }
     }
