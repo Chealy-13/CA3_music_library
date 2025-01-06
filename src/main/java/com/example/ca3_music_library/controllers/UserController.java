@@ -129,31 +129,37 @@ public class UserController {
             return "login";
         }
 
+        boolean hasError = false;
         if (!cardNumber.matches("^\\d{16}$")) {
-            model.addAttribute("errorMessage", "Invalid card number. Must be 16 digits.");
-            return "payment";
+            model.addAttribute("errorMessageCardNumber", "Invalid card number. Must be 16 digits.");
+            hasError = true;
         }
 
         if (!expiryDate.matches("^(0[1-9]|1[0-2])\\/\\d{2}$")) {
-            model.addAttribute("errorMessage", "Invalid expiry date. Must be in MM/YY format.");
-            return "payment";
+            model.addAttribute("errorMessageExpiryDate", "Invalid expiry date. Must be in MM/YY format.");
+            hasError = true;
         }
+
 
         if (!cvv.matches("^\\d{3}$")) {
-            model.addAttribute("errorMessage", "Invalid CVV. Must be 3 digits.");
+            model.addAttribute("errorMessageCvv", "Invalid CVV. Must be 3 digits.");
+            hasError = true;
+        }
+
+        if (hasError) {
             return "payment";
         }
 
-        loggedInUser.setSubscriptionStatus(true);
+         loggedInUser.setSubscriptionStatus(true);
         loggedInUser.setSubscriptionExpiry(LocalDate.now().plusYears(1));
         UserDao userDao = new UserDaoImpl("database.properties");
         userDao.updateUser(loggedInUser);
 
-        session.setAttribute("currentUser", loggedInUser);
+         session.setAttribute("currentUser", loggedInUser);
         session.setAttribute("successMessage", "Registration and payment successful! Welcome to our service.");
-
         return "redirect:/";
     }
+
 
 
 

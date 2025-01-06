@@ -59,8 +59,9 @@
     }
 </style>
 <body>
-<div th:replace="~{Additional/menu :: menu-bar}"></div>
-
+<div class="menu-bar">
+    <div th:replace="~{Additional/menu :: menu-bar}"></div>
+</div>
 <div class="profile-edit-container">
     <div class="form-header">Edit Your Profile</div>
     <form method="post" action="/edit" class="profile-edit-form">
