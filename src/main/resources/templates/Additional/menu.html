@@ -19,6 +19,8 @@
             <li th:if="${session.currentUser != null}"><a th:href="@{/logout}" th:text="#{menu.logout}">Logout</a></li>
             <li><a th:href="@{/songs}" th:text="#{menu.songs}">Songs</a></li>
             <li><a th:href="@{/artists}" th:text="#{menu.artists}">Artists</a></li>
+            <li><a th:href="@{/albums}" th:text="#{menu.albums}">Albums</a></li>
+
         </ul>
         <div th:replace="~{Additional/language_menu :: language-menu-bar}"></div>
     </nav>
