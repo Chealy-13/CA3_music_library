@@ -1,22 +1,29 @@
 package com.example.ca3_music_library.controllers;
 
 import com.example.ca3_music_library.Persistence.AlbumDao;
+import com.example.ca3_music_library.Persistence.SongDao;
 import com.example.ca3_music_library.business.Album;
 import com.example.ca3_music_library.business.Song;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 @Controller
+//@RequestMapping("/albums")
 public class AlbumController {
 
     private final AlbumDao albumDao;
+    private final SongDao songDao;
 
-    public AlbumController(AlbumDao albumDao) {
+    @Autowired
+    public AlbumController(AlbumDao albumDao, SongDao songDao) {
         this.albumDao = albumDao;
+        this.songDao = songDao;
     }
 
     /**
@@ -38,13 +45,17 @@ public class AlbumController {
      * @param model the object to pass data to the view.
      * @return displaying album details.
      */
-    @GetMapping("/album/{albumId}")
-    public String viewAlbumDetails(@PathVariable("albumId") int albumId, Model model) {
+    @GetMapping("/albums/{id}")
+    public String viewAlbumDetails(@PathVariable("id") int albumId, Model model) {
         Album album = albumDao.getByAlbumId(albumId);
-        List<Song> songs = albumDao.getSongsForAlbum(albumId);
+        if (album == null) {
+            model.addAttribute("error", "Album not found");
+            return "error";
+        }
+        List<Song> songs = songDao.getSongsForAlbum(albumId);
         model.addAttribute("album", album);
         model.addAttribute("songs", songs);
-        return "albumDetails"; // View name
+        return "albumDetails";
     }
 
     /**

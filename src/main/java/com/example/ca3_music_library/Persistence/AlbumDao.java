@@ -14,7 +14,7 @@ public interface AlbumDao {
 
     List<Album> getAlbumsByArtistId(int artistId);
 
-    List<Song> getSongsForAlbum(int albumId);
+//    List<Song> getSongsForAlbum(int albumId);
 
     List<Album> getAllAlbums();
 }
