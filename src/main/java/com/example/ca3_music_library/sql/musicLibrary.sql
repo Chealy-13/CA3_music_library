@@ -18,8 +18,11 @@ CREATE TABLE users (
                        email VARCHAR(100) NOT NULL UNIQUE,
                        isAdmin BOOLEAN DEFAULT FALSE,
                        subscriptionStatus BOOLEAN DEFAULT FALSE,
-                       subscriptionExpiry DATE
-);
+                       subscriptionExpiry DATE DEFAULT NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+
+
 
 CREATE TABLE artists
 (

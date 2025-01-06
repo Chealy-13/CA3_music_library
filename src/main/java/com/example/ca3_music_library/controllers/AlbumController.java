@@ -54,7 +54,7 @@ public class AlbumController {
      */
     @GetMapping("/albums")
     public String viewAllAlbums(Model model) {
-        List<Album> allAlbums = albumDao.getAlbumsByArtistId(0); // Placeholder: Adjust as needed
+        List<Album> allAlbums = albumDao.getAllAlbums();
         model.addAttribute("albums", allAlbums);
         return "allAlbums"; // View name
     }

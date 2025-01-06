@@ -2,92 +2,39 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-    }
-
-    .form-container {
-        width: 50%;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-header {
-        text-align: center;
-        font-size: 24px;
-        color: #007bff;
-        margin-bottom: 20px;
-    }
-
-    .form-field {
-        margin-bottom: 15px;
-    }
-
-    .form-field label {
-        font-weight: bold;
-        display: block;
-    }
-
-    .form-field input {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-    }
-
-    .form-field input[type="submit"] {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-        padding: 10px;
-    }
-
-    .form-field input[type="submit"]:hover {
-        background-color: #0056b3;
-    }
-</style>
 <body>
-<div th:replace="~{Additional/menu :: menu-bar}"></div>
+<div class="container mt-5">
 
-<div class="profile-edit-container">
-    <div class="form-header">Edit Your Profile</div>
-    <form method="post" action="/edit" class="profile-edit-form">
-
-
-        <div class="form-field">
+    <h2 class="text-center mb-4">Edit Your Profile</h2>
+    <form method="post" th:action="@{/edit}">
+        <div class="form-group">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" th:value="${user.username}" readonly>        </div>
-
-
-        <div class="form-field">
-            <label for="first">First Name:</label>
-            <input type="text" id="first" name="first" th:value="${user.firstName}">        <!-- Last Name Field -->
-        <div class="form-field">
-            <label for="last">Last Name:</label>
-            <input type="text" id="last" name="last" th:value="${user.lastName}">
+            <input type="text" id="username" name="username" class="form-control" th:value="${user.username}" readonly>
         </div>
-
-
-        <div class="form-field">
+        <div class="form-group">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="first" class="form-control" th:value="${user.firstName}">
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="last" class="form-control" th:value="${user.lastName}">
+        </div>
+        <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" th:value="${user.email}" required>        </div>
-
-    
-        <div class="form-field">
-            <input type="submit" class="btn-save" value="Save Changes">
+            <input type="email" id="email" name="email" class="form-control" th:value="${user.email}" required>
         </div>
+        <div class="text-center">
+            <input type="submit" value="Save Changes" class="btn btn-primary">
+        </div>
+        <div class="mt-3">
+            <p th:if="${errorMessage != null}" th:text="${errorMessage}" class="text-danger"></p>
+            <p th:if="${message != null}" th:text="${message}" class="text-success"></p>
         </div>
     </form>
-</div></body>
+</div>
+</body>
+</html>
