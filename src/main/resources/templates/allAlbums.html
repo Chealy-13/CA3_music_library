@@ -9,13 +9,12 @@
 <div class="container mt-5">
     <h1>Albums</h1>
     <ul class="list-group">
-        <th:block th:each="album : ${albums}">
-            <li class="list-group-item">
-                <a th:href="@{/viewAlbum/{id}(id=${album.albumId})}" th:text="${album.albumTitle}">Album Title</a>
-                <p th:text="'Release Date: ' + ${#dates.format(album.releaseDate, 'yyyy-MM-dd')}"></p>
-                <p th:text="'Artist ID: ' + ${album.artistId}"></p>
-            </li>
-        </th:block>
+        <li th:each="album : ${albums}" class="list-group-item">
+            <a th:href="@{/albums/{id}(id=${album.albumId})}" th:text="${album.albumTitle}">Album Title</a>
+            <span th:text="' (Released: ' + ${#dates.format(album.releaseDate, 'yyyy-MM-dd')} + ')'"></span>
+            <br>
+            <strong>Artist: </strong><span th:text="${album.artistName}">Artist Name</span>
+        </li>
     </ul>
 </div>
 </body>

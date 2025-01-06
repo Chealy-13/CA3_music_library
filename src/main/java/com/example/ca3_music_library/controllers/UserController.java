@@ -24,7 +24,7 @@ public class UserController {
     private final UserDao userDao;
 
     public UserController() {
-        this.userDao = new UserDaoImpl("database.properties"); // Initialize with database properties
+        this.userDao = new UserDaoImpl("database.properties");
     }
 
     /**
@@ -50,8 +50,6 @@ public class UserController {
                            @RequestParam(name = "email") String email,
                            Model model, HttpSession session) {
         String errorMsg = null;
-
-        // Validation
         if (username == null || username.isBlank()) {
             errorMsg = "Cannot register without a username";
         } else if (password == null || password.isBlank()) {
@@ -80,16 +78,14 @@ public class UserController {
             boolean registered = userDao.register(newUser);
             if (registered) {
                 session.setAttribute("currentUser", newUser);
-                // Redirect to payment page
                 return "redirect:/payment";
             }
         } catch (IllegalStateException e) {
-            // Handle duplicate username or email error
+
             model.addAttribute("errorMessage", "Username or email already exists. Please choose a different one.");
             return "registration";
         }
 
-        // Default case (shouldn't be reached)
         model.addAttribute("errorMessage", "An unexpected error occurred. Please try again.");
         return "registration";
     }
@@ -249,9 +245,9 @@ public class UserController {
         User loggedInUser = (User) session.getAttribute("currentUser");
         if (loggedInUser == null) {
             model.addAttribute("errorMessage", "You need to log in to edit your profile.");
-            return "login"; // Redirect to login if user is not logged in
+            return "login";
         }
-        model.addAttribute("user", loggedInUser); // Pass the user to the view
+        model.addAttribute("user", loggedInUser);
         return "editProfile";
     }
 
@@ -278,14 +274,11 @@ public class UserController {
             model.addAttribute("errorMessage", "You need to log in to edit your profile.");
             return "login";
         }
-
-        // Update logged-in user fields
         loggedInUser.setUsername(username);
         loggedInUser.setFirstName(first);
         loggedInUser.setLastName(last);
         loggedInUser.setEmail(email);
 
-        // Persist to database
         UserDao userDao = new UserDaoImpl("database.properties");
         boolean updated = userDao.updateUser(loggedInUser);
 
@@ -295,7 +288,7 @@ public class UserController {
             return "redirect:/profile"; // Redirect to profile page
         } else {
             model.addAttribute("errorMessage", "Failed to update your profile. Please try again.");
-            return "editProfile"; // Return to edit profile page on failure
+            return "editProfile";
         }
 
     }
@@ -312,7 +305,7 @@ public class UserController {
     public String showRenewalPage(HttpSession session, Model model) {
         User loggedInUser = (User) session.getAttribute("currentUser");
         if (loggedInUser == null) {
-            model.addAttribute("errorMessage", "You need to log in to renew your subscription.");
+            model.addAttribute("errorMessage", "You need to log in to renew your subscription first!");
             return "login";
         }
         model.addAttribute("user", loggedInUser);
@@ -445,6 +438,9 @@ public class UserController {
         }
 
         return "greeting";
+
+
+
     }
 }
 

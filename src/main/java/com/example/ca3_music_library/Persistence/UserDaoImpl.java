@@ -86,7 +86,7 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
     @Override
     public boolean register(User user) {
         if (!validateUser(user)) {
-            throw new IllegalArgumentException("Username, password, and email must be supplied for registration.");
+            throw new IllegalArgumentException("You must enter a username, password and email to proceed.");
         }
 
         String sql = "INSERT INTO users (username, password, firstName, lastName, email, isAdmin) VALUES(?, ?, ?, ?, ?, ?)";
@@ -108,8 +108,8 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
                 return rowsAffected > 0;
 
             } catch (SQLIntegrityConstraintViolationException e) {
-                log.error("Username or email already exists: {}", user.getUsername());
-                throw new IllegalStateException("Username or email already exists. Please choose a different one.");
+                log.error("Username or email already exists please try again: {}", user.getUsername());
+                throw new IllegalStateException("Username or email already exists, please choose a different one.");
             }
 
         } catch (SQLException e) {
@@ -117,7 +117,6 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
         }
         return false;
     }
-
 
     /**
      * Updates the subscription status and expiry date for a user in the database.
@@ -192,6 +191,7 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
 
 /**
 UPDATES METHODS FROM LAST PROJECT
+ *
  */
 
 //@Override

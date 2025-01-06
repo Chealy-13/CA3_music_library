@@ -7,6 +7,7 @@ package com.example.ca3_music_library.Persistence;
 
 import com.example.ca3_music_library.business.Album;
 import com.example.ca3_music_library.business.Song;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
@@ -17,7 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 @Component
 public class AlbumDaoImpl extends MySQLDao implements AlbumDao {
-
+    private final SongDao songDao;
+    @Autowired
+    public AlbumDaoImpl(SongDao songDao) {
+        this.songDao = songDao;
+    }
     /**
      * Constructs a new instance of the AlbumDaoImpl class.
      * This constructor initializes the data access object with the specified properties
@@ -46,12 +51,16 @@ public class AlbumDaoImpl extends MySQLDao implements AlbumDao {
     public Album getByAlbumId(int albumId) {
         Album album = null;
 
+        String sql = "SELECT a.*, ar.name AS artistName " +
+                "FROM album a " +
+                "JOIN artists ar ON a.artistId = ar.artistId " +
+                "WHERE a.albumId = ?";
         // Get a connection using the superclass
         Connection conn = super.getConnection();
         // TRY to get a statement from the connection
         // When you are parameterizing the query, remember that you need
         // to use the ? notation (so you can fill in the blanks later)
-        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM album where albumId = ?")) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
             // Fill in the blanks, i.e. parameterize the query
             ps.setInt(1, albumId);
@@ -61,7 +70,8 @@ public class AlbumDaoImpl extends MySQLDao implements AlbumDao {
                 // Use extraction method to avoid code repetition!
                 if (rs.next()) {
                     album = mapRow(rs);
-                    album.setSongs(getSongsForAlbum(albumId));
+                    List<Song> songs = songDao.getSongsForAlbum(albumId);
+                    album.setSongs(songs);
                 }
             } catch (SQLException e) {
                 System.out.println("SQL Exception occurred when executing SQL or processing results.");
@@ -107,7 +117,7 @@ public class AlbumDaoImpl extends MySQLDao implements AlbumDao {
                 // Use extraction method to avoid code repetition!
                 while (rs.next()) {
                     Album album = mapRow(rs);
-                    album.setSongs(getSongsForAlbum(album.getAlbumId()));
+                    album.setSongs(songDao.getSongsForAlbum(album.getAlbumId()));
                     albums.add(album);
                 }
             } catch (SQLException e) {
@@ -126,50 +136,7 @@ public class AlbumDaoImpl extends MySQLDao implements AlbumDao {
         return albums;
     }
 
-    /**
-     * Retrieves a list of Song objects associated with a specific album ID.
-     * It executes a parameterized SQL query to fetch all song records
-     * linked to the provided album ID. It constructs and returns a list of
-     * Song objects populated with details from the result set.
-     * @param albumId the unique id of the album for which songs are to be retrieved.
-     * @return a List of Song objects containing the details of songs
-     * associated with the specified album. Returns an empty list if no songs
-     * are found for the given album ID.
-     * @throws SQLException if a database access error occurs or the SQL statement is invalid.
-     */
-    @Override
-    public List<Song> getSongsForAlbum(int albumId) {
-        List<Song> songs = new ArrayList<>();
-        Connection conn = super.getConnection();
 
-        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM songs WHERE albumId = ?")) {
-            ps.setInt(1, albumId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    int songId = rs.getInt("songId");
-                    String songTitle = rs.getString("songTitle");
-                    int artistId = rs.getInt("artistId");
-                    String additionalInfo = rs.getString("additionalInfo");
-
-                    Song song = new Song(songId, songTitle, albumId, artistId, additionalInfo);
-                    songs.add(song);
-                }
-            } catch (SQLException e) {
-                System.out.println("SQL Exception occurred when executing SQL or processing results.");
-                System.out.println("Error: " + e.getMessage());
-                e.printStackTrace();
-            }
-        } catch (SQLException e) {
-            System.out.println("SQL Exception occurred when attempting to prepare SQL for execution");
-            System.out.println("Error: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            // Close the connection using the superclass method
-            super.freeConnection(conn);
-        }
-
-        return songs;
-    }
 
     /**
      * Retrieves a list of all albums from the database.
@@ -184,19 +151,28 @@ public class AlbumDaoImpl extends MySQLDao implements AlbumDao {
         List<Album> albums = new ArrayList<>();
         Connection conn = super.getConnection();
 
-        String sql = "SELECT * FROM album";
+        String sql = "SELECT a.*, ar.name AS artistName " +
+                "FROM album a " +
+                "JOIN artists ar ON a.artistId = ar.artistId";
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Album album = mapRow(rs);
-                album.setSongs(getSongsForAlbum(album.getAlbumId()));
+                Album album = Album.builder()
+                        .albumId(rs.getInt("albumId"))
+                        .albumTitle(rs.getString("albumTitle"))
+                        .artistId(rs.getInt("artistId"))
+                        .releaseDate(rs.getDate("releaseDate"))
+                        .artistName(rs.getString("artistName"))
+                        .build();
+
+                album.setSongs(songDao.getSongsForAlbum(album.getAlbumId()));
                 albums.add(album);
             }
         } catch (SQLException e) {
-            System.out.println("SQL Exception occurred when retrieving all albums.");
-            System.out.println("Error: " + e.getMessage());
+            System.err.println("SQL Exception occurred when retrieving all albums.");
+            System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
         } finally {
             super.freeConnection(conn);
@@ -220,6 +196,7 @@ public class AlbumDaoImpl extends MySQLDao implements AlbumDao {
                 .albumId(rs.getInt("albumId"))
                 .albumTitle(rs.getString("albumTitle"))
                 .artistId(rs.getInt("artistId"))
+                .artistName(rs.getString("artistName"))
                 .releaseDate(rs.getDate("releaseDate"))
                 .build();
     }

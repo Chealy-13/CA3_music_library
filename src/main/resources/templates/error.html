@@ -6,7 +6,6 @@
     <title>Uh oh..</title>
 </head>
 <body>
-<!-- Include the menu bar fragment -->
 <div th:replace="~{Additional/menu :: menu-bar}"></div>
 <h1>Oops, something went wrong!</h1>
 <p th:if="${errorMessage != null}" th:text="${errorMessage}"></p>
