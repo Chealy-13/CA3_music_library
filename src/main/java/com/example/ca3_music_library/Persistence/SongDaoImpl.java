@@ -532,7 +532,48 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
         return song;
     }
 
+    /**
+     * Retrieves a list of Song objects associated with a specific album ID.
+     * It executes a parameterized SQL query to fetch all song records
+     * linked to the provided album ID. It constructs and returns a list of
+     * Song objects populated with details from the result set.
+     * @param albumId the unique id of the album for which songs are to be retrieved.
+     * @return a List of Song objects containing the details of songs
+     * associated with the specified album. Returns an empty list if no songs
+     * are found for the given album ID.
+     * @throws SQLException if a database access error occurs or the SQL statement is invalid.
+     */
+    @Override
+    public List<Song> getSongsForAlbum(int albumId) {
+        List<Song> songs = new ArrayList<>();
+        Connection conn = super.getConnection();
 
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM songs WHERE albumId = ?")) {
+            ps.setInt(1, albumId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    songs.add(new Song(rs.getInt("songId"),
+                            rs.getString("songTitle"),
+                            albumId,
+                            rs.getInt("artistId"),
+                            rs.getString("additionalInfo")));
+                }
+            } catch (SQLException e) {
+                System.out.println("SQL Exception occurred when executing SQL or processing results.");
+                System.out.println("Error: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Exception occurred when attempting to prepare SQL for execution");
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            // Close the connection using the superclass method
+            super.freeConnection(conn);
+        }
+
+        return songs;
+    }
 
 //    /**
 //     * Maps the current row of the given ResultSet to a Song object.

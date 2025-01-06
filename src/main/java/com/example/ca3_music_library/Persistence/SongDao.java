@@ -35,6 +35,8 @@ public interface SongDao {
 
     Song getRandomSong();
 
+    List<Song> getSongsForAlbum(int albumId);
+
     /*
      * Feature: Random Song selector/generator
      * Developer: Sophie Nardone
