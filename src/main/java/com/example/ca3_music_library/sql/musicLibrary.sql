@@ -18,9 +18,7 @@ CREATE TABLE users (
                        email VARCHAR(100) NOT NULL UNIQUE,
                        isAdmin BOOLEAN DEFAULT FALSE,
                        subscriptionStatus BOOLEAN DEFAULT FALSE,
-                       subscriptionExpiry DATE DEFAULT NULL,
-                       createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                       updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                       subscriptionExpiry DATE DEFAULT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 
