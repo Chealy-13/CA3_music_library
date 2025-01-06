@@ -472,6 +472,32 @@ public class SongDaoImpl extends MySQLDao implements SongDao {
         }
         return mostPopularSong;
     }
+    @Override
+    public List<Song> searchSongs(String query) {
+        List<Song> songs = new ArrayList<>();
+        Connection conn = super.getConnection();
+        String sql = "SELECT * FROM songs WHERE songTitle LIKE ? OR artistId LIKE ? OR albumId LIKE ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            String likeQuery = "%" + query + "%";
+            ps.setString(1, likeQuery);
+            ps.setString(2, likeQuery);
+            ps.setString(3, likeQuery);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    songs.add(mapRowToSong(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            super.freeConnection(conn);
+        }
+        return songs;
+    }
+
+
 
 
 //    /**

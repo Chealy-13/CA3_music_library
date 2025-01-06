@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Song Search Results</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Song Search Results</h1>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Artist</th>
+            <th>Album</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="song : ${songSearchResults}">
+            <td th:text="${song.songTitle}">Song Title</td>
+            <td th:text="${song.artistID}">Artist Name</td>
+            <td th:text="${song.albumID}">Album Name</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a href="/songs" class="btn btn-primary">Back to Song List</a>
+</div>
+</body>
+</html>
