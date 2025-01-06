@@ -8,6 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import static com.example.ca3_music_library.sql.DatabaseConnect.getConnection;
 
 @Slf4j
 public class UserDaoImpl extends MySQLDao implements UserDao {
@@ -120,7 +124,8 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
      * Firstly connects to the database and prepares an SQL `UPDATE` statement.
      * Then updates the `subscriptionStatus` and `subscriptionExpiry` fields for the specified username.
      * Lastly executes the SQL statement and returns whether the operation was successful.
-     * @param username The username of the user whose subscription details need to be updated.
+     *
+     * @param username           The username of the user whose subscription details need to be updated.
      * @param subscriptionStatus The new subscription status.
      * @param subscriptionExpiry The new subscription expiry date as a (localdate).
      * @return returns if the subscription details are successfully updated false otherwise.
@@ -141,6 +146,7 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
         }
         return false;
     }
+
     /**
      * The ppoint of this method is to update the user's details in the database, including their personal information and subscription details.
      * It does the following
@@ -180,10 +186,8 @@ public class UserDaoImpl extends MySQLDao implements UserDao {
                 user.getPassword() != null && !user.getPassword().isBlank() &&
                 user.getEmail() != null && !user.getEmail().isBlank();
     }
+
 }
-
-
-
 //@Override
 //public boolean RegisterU(String username, String password, String email) {
     //This ine is used instert row to "users" table with values: useranme, password, email.

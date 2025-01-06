@@ -5,6 +5,8 @@ import com.example.ca3_music_library.Persistence.UserDaoImpl;
 import com.example.ca3_music_library.business.User;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Locale;
 
 
 @Slf4j
@@ -22,6 +26,7 @@ public class UserController {
     public UserController() {
         this.userDao = new UserDaoImpl("database.properties"); // Initialize with database properties
     }
+
     /**
      * User registration takes care of validating the input data, creating a new user,
      * and if successful redirect them to the payment page
@@ -96,9 +101,9 @@ public class UserController {
     /**
      * Displays the payment page to allow users to complete their subscription.
      *
-     * @param session   The current HTTP session to validate the user's login status.
-     * @param model     The model object to handle messages or errors.
-     * Returns the "payment" view if the user is logged in, otherwise redirects to the login html page.
+     * @param session The current HTTP session to validate the user's login status.
+     * @param model   The model object to handle messages or errors.
+     *                Returns the "payment" view if the user is logged in, otherwise redirects to the login html page.
      */
     @GetMapping("/payment")
     public String showPaymentPage(HttpSession session, Model model) {
@@ -109,14 +114,16 @@ public class UserController {
         }
         return "payment"; // Ensure the payment.html file exists
     }
+
     /**
      * Processes payment by checking the user's credit card details: card number, expiry date, and CVV
+     *
      * @param cardNumber The 16-digit credit card number entered by the user.
      * @param expiryDate The card's expiry date in MM/YY format.
-     * @param cvv The 3-digit security code (CVV) on the card.
-     * @param session The current HTTP session to get the logged-in user's information.
-     * @param model Used to display success or error messages.
-     * return Redirects to the home page if payment is successful, or back to the "payment" page if the details are invalid.
+     * @param cvv        The 3-digit security code (CVV) on the card.
+     * @param session    The current HTTP session to get the logged-in user's information.
+     * @param model      Used to display success or error messages.
+     *                   return Redirects to the home page if payment is successful, or back to the "payment" page if the details are invalid.
      */
     @PostMapping("/payment/confirm")
     public String confirmPayment(@RequestParam(name = "cardNumber") String cardNumber,
@@ -150,17 +157,15 @@ public class UserController {
             return "payment";
         }
 
-         loggedInUser.setSubscriptionStatus(true);
+        loggedInUser.setSubscriptionStatus(true);
         loggedInUser.setSubscriptionExpiry(LocalDate.now().plusYears(1));
         UserDao userDao = new UserDaoImpl("database.properties");
         userDao.updateUser(loggedInUser);
 
-         session.setAttribute("currentUser", loggedInUser);
+        session.setAttribute("currentUser", loggedInUser);
         session.setAttribute("successMessage", "Registration and payment successful! Welcome to our service.");
         return "redirect:/";
     }
-
-
 
 
     /**
@@ -298,14 +303,109 @@ public class UserController {
         }
 
     }
+
+    @GetMapping("/renew")
+    public String showRenewalPage(HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("currentUser");
+        if (loggedInUser == null) {
+            model.addAttribute("errorMessage", "You need to log in to renew your subscription.");
+            return "login";
+        }
+        model.addAttribute("user", loggedInUser);
+        return "renewSubscription";
+    }
+
+    @PostMapping("/renew/confirm")
+    public String confirmRenewal(@RequestParam(name = "cardNumber") String cardNumber,
+                                 @RequestParam(name = "expiryDate") String expiryDate,
+                                 @RequestParam(name = "cvv") String cvv,
+                                 HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("currentUser");
+        if (loggedInUser == null) {
+            model.addAttribute("errorMessage", "You need to log in to renew your subscription.");
+            return "login";
+        }
+
+        if (!cardNumber.matches("^\\d{16}$")) {
+            model.addAttribute("errorMessageCardNumber", "Invalid card number. Must be 16 digits.");
+            return "renewSubscription";
+        }
+
+        if (!expiryDate.matches("^(0[1-9]|1[0-2])\\/\\d{2}$")) {
+            model.addAttribute("errorMessageExpiryDate", "Invalid expiry date. Must be in MM/YY format.");
+            return "renewSubscription";
+        }
+
+        if (!cvv.matches("^\\d{3}$")) {
+            model.addAttribute("errorMessageCvv", "Invalid CVV. Must be 3 digits.");
+            return "renewSubscription";
+        }
+
+        // Update subscription
+        LocalDate currentExpiry = loggedInUser.getSubscriptionExpiry();
+        LocalDate newExpiry = (currentExpiry != null && currentExpiry.isAfter(LocalDate.now()))
+                ? currentExpiry.plusYears(1)
+                : LocalDate.now().plusYears(1);
+
+        loggedInUser.setSubscriptionStatus(true);
+        loggedInUser.setSubscriptionExpiry(newExpiry);
+
+        UserDao userDao = new UserDaoImpl("database.properties");
+        userDao.updateSubscription(loggedInUser.getUsername(), true, newExpiry);
+
+        session.setAttribute("currentUser", loggedInUser);
+        session.setAttribute("successMessage", "Subscription renewed successfully!");
+
+        return "redirect:/";
+    }
+
+    @PostMapping("/renewSubscription/confirm")
+    public String confirmRenewSubscription(@RequestParam(name = "cardNumber") String cardNumber,
+                                           @RequestParam(name = "expiryDate") String expiryDate,
+                                           @RequestParam(name = "cvv") String cvv,
+                                           HttpSession session, Model model) {
+        User loggedInUser = (User) session.getAttribute("currentUser");
+        if (loggedInUser == null) {
+            model.addAttribute("errorMessage", "You need to log in to renew your subscription.");
+            return "login";
+        }
+
+        if (!cardNumber.matches("^\\d{16}$")) {
+            model.addAttribute("errorMessage", "Invalid card number. Must be 16 digits.");
+            return "renewSubscription";
+        }
+
+        if (!expiryDate.matches("^(0[1-9]|1[0-2])\\/\\d{2}$")) {
+            model.addAttribute("errorMessage", "Invalid expiry date. Must be in MM/YY format.");
+            return "renewSubscription";
+        }
+
+        if (!cvv.matches("^\\d{3}$")) {
+            model.addAttribute("errorMessage", "Invalid CVV. Must be 3 digits.");
+            return "renewSubscription";
+        }
+
+        LocalDate newExpiryDate = loggedInUser.getSubscriptionExpiry() != null && loggedInUser.getSubscriptionExpiry().isAfter(LocalDate.now())
+                ? loggedInUser.getSubscriptionExpiry().plusYears(1)
+                : LocalDate.now().plusYears(1);
+
+        loggedInUser.setSubscriptionStatus(true);
+        loggedInUser.setSubscriptionExpiry(newExpiryDate);
+
+        UserDao userDao = new UserDaoImpl("database.properties");
+        userDao.updateUser(loggedInUser);
+
+        session.setAttribute("currentUser", loggedInUser);
+        session.setAttribute("successMessage", "Subscription renewed successfully!");
+
+        return "redirect:/";
+    }
 }
 
-
-
-    /**
-     * Displays the payment page to allow users to complete their subscription.
-     *
-     * @param session   The current HTTP session to validate the user's login status.
-     * @param model     The model object to handle messages or errors.
-     * Returns the "payment" view if the user is logged in, otherwise redirects to the login html page.
-     */
+/**
+ * Displays the payment page to allow users to complete their subscription.
+ *
+ * @param session   The current HTTP session to validate the user's login status.
+ * @param model     The model object to handle messages or errors.
+ * Returns the "payment" view if the user is logged in, otherwise redirects to the login html page.
+ */
