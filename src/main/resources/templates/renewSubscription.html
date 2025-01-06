@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Renew Subscription</title>
+</head>
+<body>
+<h2>Renew Your Subscription</h2>
+<form method="post" th:action="@{/renewSubscription/confirm}">
+  <label for="cardNumber">Card Number:</label>
+  <input type="text" id="cardNumber" name="cardNumber" required>
+  <p th:if="${errorMessage != null}" th:text="${errorMessage}" style="color: red;"></p>
+
+  <label for="expiryDate">Expiry Date (MM/YY):</label>
+  <input type="text" id="expiryDate" name="expiryDate" required>
+
+  <label for="cvv">CVV:</label>
+  <input type="text" id="cvv" name="cvv" required>
+
+  <input type="submit" value="Renew">
+</form>
+</body>
+</html>
+
