@@ -21,6 +21,9 @@
             <li><a th:href="@{/songs}" th:text="#{menu.songs}">Songs</a></li>
             <li><a th:href="@{/artists}" th:text="#{menu.artists}">Artists</a></li>
             <li><a th:href="@{/albums}" th:text="#{menu.albums}">Albums</a></li>
+            <li th:if="${session.currentUser != null}">
+                <a th:href="@{/playlists(userId=${session.currentUser.userId})}" th:text="#{menu.playlists}">Playlists</a>
+            </li>
 
         </ul>
         <div th:replace="~{Additional/language_menu :: language-menu-bar}" class="language-menu"></div>

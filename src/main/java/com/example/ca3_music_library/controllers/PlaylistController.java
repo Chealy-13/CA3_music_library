@@ -4,6 +4,7 @@ import com.example.ca3_music_library.Persistence.PlaylistDao;
 import com.example.ca3_music_library.Persistence.SongDao;
 import com.example.ca3_music_library.business.Playlist;
 import com.example.ca3_music_library.business.Song;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,13 @@ public class PlaylistController {
     private final PlaylistDao playlistDao;
     private final SongDao songDao;
 
+
     /**
      * Creates a new PlaylistController instance with the provided DAOs.
      * @param playlistDao the data access object for playlist-related operations.
      * @param songDao the data access object for song-related operations.
      */
+    @Autowired
     public PlaylistController(PlaylistDao playlistDao, SongDao songDao) {
         this.playlistDao = playlistDao;
         this.songDao = songDao;
@@ -36,8 +39,10 @@ public class PlaylistController {
      */
     @GetMapping
     public String viewAllPlaylists(@RequestParam("userId") int userId, Model model) {
-        List<Playlist> playlists = playlistDao.getAllPlaylists(userId);
-        model.addAttribute("playlists", playlists);
+        List<Playlist> userPlaylists = playlistDao.getUserPlaylists(userId);
+        List<Playlist> publicPlaylists = playlistDao.getPublicPlaylists();
+        model.addAttribute("userPlaylists", userPlaylists);
+        model.addAttribute("publicPlaylists", publicPlaylists);
         return "playlists";
     }
 
@@ -63,16 +68,42 @@ public class PlaylistController {
      * @param creatorId the ID of the user creating the playlist.
      * @return a redirect to the list of playlists.
      */
+//    @PostMapping("/create")
+//    public String createPlaylist(@RequestParam String name, @RequestParam boolean isPublic, @RequestParam int creatorId) {
+//        Playlist newPlaylist = Playlist.builder()
+//                .playlistName(name)
+//                .isPublic(isPublic)
+//                .creatorId(creatorId)
+//                .build();
+//        playlistDao.createPlaylist(newPlaylist);
+//        return "redirect:/playlists";
+//    }
     @PostMapping("/create")
-    public String createPlaylist(@RequestParam String name, @RequestParam boolean isPublic, @RequestParam int creatorId) {
-        Playlist newPlaylist = Playlist.builder()
-                .playlistName(name)
-                .isPublic(isPublic)
-                .creatorId(creatorId)
-                .build();
-        playlistDao.createPlaylist(newPlaylist);
-        return "redirect:/playlists";
+    public String createPlaylist(@RequestParam String name, @RequestParam boolean isPublic, @RequestParam int creatorId, Model model) {
+        System.out.println("Playlist Name: " + name);
+        System.out.println("Is Public: " + isPublic);
+        System.out.println("Creator ID: " + creatorId);
+
+        try {
+            Playlist newPlaylist = Playlist.builder()
+                    .playlistName(name)
+                    .isPublic(isPublic)
+                    .creatorId(creatorId)
+                    .build();
+
+            boolean success = playlistDao.createPlaylist(newPlaylist);
+            if (!success) {
+                model.addAttribute("error", "Failed to create playlist.");
+                return "error";
+            }
+            return "redirect:/playlists?userId=" + creatorId;
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "An unexpected error occurred: " + e.getMessage());
+            return "error";
+        }
     }
+
 
     /**
      * Adds a song to a playlist.
@@ -107,5 +138,15 @@ public class PlaylistController {
     public String deletePlaylist(@PathVariable("id") int playlistId) {
         playlistDao.deletePlaylist(playlistId);
         return "redirect:/playlists";
+    }
+
+    @PostMapping("/{id}/rename")
+    public String renamePlaylist(@PathVariable("id") int playlistId, @RequestParam("name") String name) {
+        Playlist playlist = playlistDao.getPlaylistById(playlistId);
+        if (playlist != null) {
+            playlist.setPlaylistName(name);
+            playlistDao.updatePlaylist(playlist);
+        }
+        return "redirect:/playlists/" + playlistId;
     }
 }

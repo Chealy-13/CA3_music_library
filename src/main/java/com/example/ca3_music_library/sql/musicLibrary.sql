@@ -160,14 +160,35 @@ INSERT INTO songs (songTitle, albumId, artistId, additionalInfo) VALUES ('The Sc
 INSERT INTO songs (songTitle, albumId, artistId, additionalInfo) VALUES ('Sparks', 10, 5, 'Parachutes');
 INSERT INTO songs (songTitle, albumId, artistId, additionalInfo) VALUES ('Yellow', 10, 5, 'Parachutes');
 
+CREATE TABLE playlists (
+                           playlistId INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                           userId INT UNSIGNED NOT NULL,
+                           title VARCHAR(100) NOT NULL,
+                           isPublic BOOLEAN NOT NULL DEFAULT FALSE,
+                           createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-CREATE TABLE Rating (
-    ratingId INT AUTO_INCREMENT PRIMARY KEY,
-    userId INT NOT NULL,
-    songId INT NOT NULL,
-    rating INT CHECK (rating BETWEEN 1 AND 5),
+                           CONSTRAINT fk_playlist_user FOREIGN KEY (userId) REFERENCES users(userId)
+);
 
-FOREIGN KEY (userId ) REFERENCES Users(userId )
+CREATE TABLE playlist_songs (
+                                playlistId INT UNSIGNED NOT NULL,
+                                songId INT UNSIGNED NOT NULL,
+
+                                PRIMARY KEY (playlistId, songId),
+                                CONSTRAINT fk_playlist FOREIGN KEY (playlistId) REFERENCES playlists(playlistId),
+                                CONSTRAINT fk_song FOREIGN KEY (songId) REFERENCES songs(songId)
+);
+
+CREATE TABLE ratings (
+                         ratingId INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                         userId INT UNSIGNED NOT NULL,
+                         songId INT UNSIGNED NOT NULL,
+                         rating INT CHECK (rating >= 1 AND rating <= 5),
+                         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                         CONSTRAINT fk_rating_user FOREIGN KEY (userId) REFERENCES users(userId),
+                         CONSTRAINT fk_rating_song FOREIGN KEY (songId) REFERENCES songs(songId)
+);
 
 
 );
