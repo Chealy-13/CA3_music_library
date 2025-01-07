@@ -176,9 +176,9 @@ public class UserController {
                         Model model, HttpSession session) {
         String errorMsg = null;
         if (username == null || username.isBlank()) {
-            errorMsg = "Cannot register without a username";
+            errorMsg = "Cannot login without a username";
         } else if (password == null || password.isBlank()) {
-            errorMsg = "Cannot register without a password";
+            errorMsg = "Cannot login without a password";
         }
         if (errorMsg != null) {
             model.addAttribute("errorMessage", errorMsg);
@@ -188,7 +188,7 @@ public class UserController {
         UserDao userDao = new UserDaoImpl("database.properties");
         User loggedInUser = userDao.login(username, password);
         if (loggedInUser != null) {
-            String success = "Login successful";
+            String success = "Login successfully";
             model.addAttribute("message", success);
             session.setAttribute("currentUser", loggedInUser);
             return "index";
@@ -283,9 +283,9 @@ public class UserController {
         boolean updated = userDao.updateUser(loggedInUser);
 
         if (updated) {
-            session.setAttribute("currentUser", loggedInUser); // Update session
+            session.setAttribute("currentUser", loggedInUser);
             model.addAttribute("message", "Your profile has been updated successfully.");
-            return "redirect:/profile"; // Redirect to profile page
+            return "redirect:/profile";
         } else {
             model.addAttribute("errorMessage", "Failed to update your profile. Please try again.");
             return "editProfile";
